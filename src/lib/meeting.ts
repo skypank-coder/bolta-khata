@@ -4,7 +4,7 @@ import {
   computeBalances, memberBalance, meetingTotals, newId, reversedIds,
   type EntryDraft, type LedgerEntry,
 } from './ledger';
-import { matchMember, type MatchResult } from './phonetic';
+import { matchMember, phoneticKey, type MatchResult } from './phonetic';
 import { tokenize } from './numbers';
 import type { Member } from './store';
 
@@ -279,7 +279,13 @@ export function step(state: MeetingState, heard: Heard, ctx: Ctx): StepResult {
   }
 
   const intent = bestIntent(heard, ctx.members);
-  const s: MeetingState = { ...state, misses: 0 };
+  let s: MeetingState = { ...state, misses: 0 };
+  // Waiting for a new member's name, but this sentence is clearly something else
+  // ("Rekha 500 bachat", "meeting band karo"): drop the request and handle it normally.
+  if (s.pending?.kind === 'needNewName' && intent.kind !== 'addMember'
+    && (!['unknown', 'name'].includes(intent.kind) || /\d/.test(text))) {
+    s = { ...s, pending: null };
+  }
 
   // Things that work at any time.
   if (intent.kind === 'help') return reply(s, { key: 'help' });
@@ -313,10 +319,17 @@ export function step(state: MeetingState, heard: Heard, ctx: Ctx): StepResult {
     if (intent.kind === 'reject') return reply({ ...s, pending: null }, { key: 'rejected' });
     if (intent.kind !== 'addMember') return reply(s, { key: 'confirmWaiting' });
   }
+  if (intent.kind === 'addMember' && (s.pending?.kind === 'confirm' || s.pending?.kind === 'confirmClose')) {
+    return reply(s, { key: 'confirmWaiting' });
+  }
   if (s.pending?.kind === 'needNewName' || intent.kind === 'addMember') {
+    // An existing member's name said in reply is not a new member.
+    if (intent.kind === 'name' && intent.member.best) return reply({ ...s, pending: null }, { key: 'memberExists', member: intent.member.best.memberId });
     const name = intent.kind === 'addMember' ? intent.name : extractNewName(text);
     if (!name) return reply({ ...s, pending: { kind: 'needNewName' } }, { key: 'needNewName' });
-    const same = ctx.members.find((m) => [m.name, m.nameLocal].some((n) => n && n.toLowerCase() === name.toLowerCase()));
+    // Same person said in another script or spelling ("Suman Sharma" / "सुमन शर्मा") is still a duplicate.
+    const key = (n: string) => romanName(n).split(/\s+/).map(phoneticKey).join(' ');
+    const same = ctx.members.find((m) => [m.name, m.nameLocal].some((n) => n && key(n) === key(name)));
     if (same) return reply({ ...s, pending: null }, { key: 'memberExists', member: same.id });
     const local = hasDevanagari(name) ? name : undefined;
     const member: Member = { id: newId('m'), name: romanName(name), nameLocal: local, role: ctx.members.length ? 'member' : 'leader' };
@@ -389,7 +402,11 @@ export function step(state: MeetingState, heard: Heard, ctx: Ctx): StepResult {
         const chosen = pick.best?.memberId;
         if (!chosen) {
           if (intent.kind === 'reject') return reply({ ...s, pending: null }, { key: 'rejected' });
-          return reply(s, { key: 'pick', options: p.options });
+          // Someone moved on to something else entirely: stop asking and handle it.
+          const movedOn = ['start', 'end', 'undo', 'attendanceDone', 'cashCount'].includes(intent.kind)
+            || (intent.kind === 'entry' && intent.items.length > 0);
+          if (!movedOn) return reply(s, { key: 'pick', options: p.options });
+          break;
         }
         const resolved: MatchResult = { best: { memberId: chosen, score: 1, exact: true, start: 0, end: 0 }, ambiguous: null };
         const cleared = { ...s, pending: null, lastSpeaker: chosen };

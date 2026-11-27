@@ -310,6 +310,40 @@ describe('adding members by voice', () => {
     expect(await m.say('नवीन सदस्य: सुमन')).toEqual({ key: 'addMemberAsk', name: 'सुमन' });
   });
 
+  it('does not turn an ordinary sentence into a member name', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    expect((await m.say('naya sadasya jodo')).key).toBe('needNewName');
+    expect(await m.say('Rekha 500 bachat')).toMatchObject({ key: 'readback' });
+    expect(m.members).toHaveLength(12);
+    await m.say('sahi hai');
+    expect((await m.say('naya sadasya jodo')).key).toBe('needNewName');
+    expect(await m.say('Radha')).toEqual({ key: 'memberExists', member: 'm06' });
+  });
+
+  it('knows the same person added in English and in Hindi', async () => {
+    const m = await meeting();
+    await m.say('add member Suman Sharma');
+    await m.say('sahi hai');
+    expect((await m.say('नया सदस्य: सुमन शर्मा')).key).toBe('memberExists');
+  });
+
+  it('stops asking "which Sunita?" when the group moves on', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    expect((await m.say('Sunita ko 200 loan')).key).toBe('pick');
+    expect((await m.say('xyz')).key).toBe('pick');
+    expect(await m.say('Geeta 300 bachat')).toMatchObject({ key: 'readback', drafts: [{ memberId: 'm07' }] });
+  });
+
+  it('does not let "add member" swallow an entry waiting for sahi', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    await m.say('Kamla 200 bachat');
+    expect((await m.say('add member Kavita')).key).toBe('confirmWaiting');
+    expect((await m.say('sahi hai')).key).toBe('saved');
+  });
+
   it('will not start a meeting for a group with no members', async () => {
     const r = step(initialState, { text: 'meeting shuru karo' }, { members: [], ledger: [] });
     expect(r.reply.key).toBe('noMembers');
