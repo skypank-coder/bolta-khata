@@ -164,6 +164,25 @@ export function useBoltaKhata(opts: KhataOptions = {}) {
     const t = setTimeout(() => void push(), 600);
     return () => clearTimeout(t);
   }, [data, push, remoteId]);
+  // Followers (NGO, bank) watch live: new entries appear every few seconds, coins and all.
+  useEffect(() => {
+    if (!remoteId || role !== 'viewer') return;
+    const tick = async () => {
+      const before = dataRef.current;
+      const merged = await pull(before).catch(() => null);
+      if (!merged || !before || merged.ledger.length === before.ledger.length) return;
+      const fresh = merged.ledger.slice(before.ledger.length);
+      commitData(merged);
+      const resumed = resumeState(merged.ledger);
+      stateRef.current = resumed;
+      setMstate(resumed);
+      if (fresh.some((e) => ['savings', 'repayment', 'loan'].includes(e.type))) setStampKey((k) => k + 1);
+      if (fresh.some((e) => e.type === 'meeting_close' || e.type === 'member_join')) setPetalKey((k) => k + 1);
+    };
+    const every = setInterval(() => void tick(), 4000);
+    return () => clearInterval(every);
+  }, [commitData, pull, remoteId, role]);
+
   useEffect(() => {
     if (!remoteId) return;
     const on = () => void push();
