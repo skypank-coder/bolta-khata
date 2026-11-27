@@ -46,7 +46,7 @@ export function Khata({ app }: { app: App }) {
           </div>
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          {data.tamperBackup ? (
+          {!app.isDemo ? null : data.tamperBackup ? (
             <button type="button" onClick={app.undoTamper} className="rounded-lg bg-bahi px-4 py-2.5 font-semibold text-patra">
               {k.undoTamper}
             </button>

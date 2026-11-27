@@ -143,7 +143,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
             )}
           </div>
 
-          <div className="px-4 pb-4 pl-16">
+          {!app.readOnly && <div className="px-4 pb-4 pl-16">
             <CoachStrip
               hint={(() => {
                 const h = nextHint(mstate, members, lang);
@@ -154,7 +154,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
               disabled={busy}
               onSay={(ph) => app.say(ph)}
             />
-          </div>
+          </div>}
 
           <div className="border-t-2 border-bahi/30">
             <h2 className="py-2 pl-16 font-display text-lg text-bahi">{t.todayPage}</h2>
@@ -183,7 +183,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
           flight={flight}
         />
 
-        <div className="rounded-xl border-2 border-haldi/70 bg-bahi-dark/40 p-4">
+        {app.isDemo && <div className="rounded-xl border-2 border-haldi/70 bg-bahi-dark/40 p-4">
           <button
             type="button"
             onClick={() => (app.demoPlaying ? app.stopLoop() : void app.playDemo())}
@@ -193,7 +193,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
           </button>
           <p className="mt-2 text-sm text-patra/80">{t.playDemoHint}</p>
           <p className="mt-1 hidden text-sm text-patra/80 lg:block">{t.keyHint}</p>
-        </div>
+        </div>}
 
         <button
           type="button"
@@ -206,7 +206,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
       </aside>
 
       {/* Thumb zone: mic in the middle, the two switches beside it */}
-      <div className="no-print cloth fixed inset-x-0 bottom-0 z-20 border-t-4 border-haldi/70 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_30px_rgba(0,0,0,.35)]">
+      {!app.readOnly && <div className="no-print cloth fixed inset-x-0 bottom-0 z-20 border-t-4 border-haldi/70 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-10px_30px_rgba(0,0,0,.35)]">
         {typing && (
           <form
             className="mx-auto mb-3 flex max-w-xl gap-2"
@@ -243,7 +243,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
             {t.typeInstead}
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
