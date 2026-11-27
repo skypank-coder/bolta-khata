@@ -117,3 +117,35 @@ describe('voice meeting, end to end', () => {
     expect(m.state.phase).toBe('idle');
   });
 });
+
+describe('examples shown on screen are understood', async () => {
+  const { EXAMPLES } = await import('../phrases');
+  const { parseIntent } = await import('../intent');
+  const { DEMO_GROUP } = await import('../store');
+  const expected: Record<string, string> = {
+    'मीटिंग शुरू करो': 'start', 'मैं मीना हूँ': 'name', 'राधा हाज़िर': 'name', 'सुनीता यादव': 'name', 'हाज़िरी पूरी': 'attendanceDone',
+    'मैं मीना, सौ रुपये बचत': 'entry', 'रेखा की किस्त पाँच सौ': 'entry', 'राधा को डेढ़ हज़ार लोन': 'entry',
+    'मेरा कितना जमा है?': 'querySelf', 'पिछली एंट्री हटाओ': 'undo', 'मीटिंग बंद करो': 'end',
+    'मीटिंग सुरू करा': 'start', 'मी मीना': 'name', 'राधा हजर': 'name', 'हजेरी पूर्ण': 'attendanceDone',
+    'मी मीना, शंभर रुपये बचत': 'entry', 'रेखा हप्ता पाचशे': 'entry', 'राधाला दीड हजार कर्ज': 'entry',
+    'माझी किती बचत आहे?': 'querySelf', 'मीटिंग बंद करा': 'end',
+    'Start the meeting': 'start', 'I am Meena': 'name', 'Radha present': 'name', 'Attendance done': 'attendanceDone',
+    'Meena, 100 rupees savings': 'entry', 'Rekha repayment 500': 'entry', 'Radha loan 1500': 'entry',
+    'How much have I saved?': 'querySelf', 'Undo': 'undo', 'End the meeting': 'end',
+  };
+  for (const lang of ['hi', 'mr', 'en'] as const) {
+    for (const list of Object.values(EXAMPLES[lang])) {
+      for (const ex of list) {
+        it(`${lang}: ${ex}`, () => {
+          const intent = parseIntent(ex, DEMO_GROUP.members);
+          expect(intent.kind).toBe(expected[ex]);
+          if (ex === 'सुनीता यादव' && intent.kind === 'name') expect(intent.member.best?.memberId).toBe('m03');
+          if (ex === 'राधाला दीड हजार कर्ज' && intent.kind === 'entry') {
+            expect(intent.member.best?.memberId).toBe('m06');
+            expect(intent.items).toEqual([{ type: 'loan', amount: 1500 }]);
+          }
+        });
+      }
+    }
+  }
+});

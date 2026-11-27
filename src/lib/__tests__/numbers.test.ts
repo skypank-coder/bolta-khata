@@ -10,6 +10,9 @@ describe('transliterate', () => {
     expect(transliterate('सुनीता')).toBe('suneetaa');
     expect(transliterate('कमल')).toBe('kamal');
     expect(transliterate('हज़ार')).toBe('hazaar');
+    expect(transliterate('कितना')).toBe('kitnaa');
+    expect(transliterate('पिछली')).toBe('pichhlee');
+    expect(transliterate('बचत')).toBe('bachat');
   });
   it('maps Devanagari digits', () => {
     expect(transliterate('५००')).toBe('500');
