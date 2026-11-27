@@ -16,7 +16,7 @@ const HINDI_NUMBERS: Vocab = [
   [11, ['gyarah', 'gyaarah', 'gyara']], [12, ['barah', 'baarah', 'bara']], [13, ['terah', 'tera']], [14, ['chaudah', 'chauda']],
   [15, ['pandrah', 'pandra', 'pendra']], [16, ['solah', 'sola']], [17, ['satrah', 'satra']], [18, ['atharah', 'athaarah', 'athara']],
   [19, ['unnis', 'unnees', 'unis']], [20, ['bees', 'bis']],
-  [21, ['ikkis', 'ikkees']], [22, ['baais', 'bais', 'baees']], [23, ['teis', 'tees_23', 'teyis']], [24, ['chaubis', 'chaubees']],
+  [21, ['ikkis', 'ikkees']], [22, ['baais', 'bais', 'baees']], [23, ['teis', 'teyis', 'teyees']], [24, ['chaubis', 'chaubees']],
   [25, ['pachchis', 'pachchees', 'pachis', 'pacchis']], [26, ['chhabbis', 'chhabbees']], [27, ['sattais', 'sattaees']],
   [28, ['atthais', 'atthaees']], [29, ['unatis', 'untees', 'unattis']], [30, ['tees', 'tis']],
   [31, ['iktis', 'ikattees', 'iktees']], [32, ['battis', 'battees']], [33, ['taintis', 'taintees', 'tetis']], [34, ['chautis', 'chautees']],
@@ -86,12 +86,29 @@ function buildLookup(...lists: Vocab[]): Map<string, number> {
   for (const list of lists) {
     for (const [value, words] of list) {
       for (const w of words) {
-        const key = fold(w.split('_')[0]);
+        const key = fold(w);
         if (!map.has(key)) map.set(key, value);
       }
     }
   }
   return map;
+}
+
+/** Words that mean two different numbers in the tables (should be none). */
+export function vocabCollisions(): string[] {
+  const seen = new Map<string, number>();
+  const out: string[] = [];
+  for (const list of [HINDI_NUMBERS, ENGLISH_NUMBERS, MARATHI_NUMBERS, MULTIPLIERS, FRACTION_WORDS]) {
+    for (const [value, words] of list) {
+      for (const w of words) {
+        const k = fold(w);
+        const prev = seen.get(k);
+        if (prev !== undefined && prev !== value) out.push(`${w}: ${prev} vs ${value}`);
+        seen.set(k, value);
+      }
+    }
+  }
+  return out;
 }
 
 const NUMBER_WORDS = buildLookup(HINDI_NUMBERS, ENGLISH_NUMBERS, MARATHI_NUMBERS);

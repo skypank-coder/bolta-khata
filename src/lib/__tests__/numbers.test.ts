@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findAmounts, parseAmount, tokenize, formatRupees } from '../numbers';
+import { findAmounts, parseAmount, tokenize, formatRupees, vocabCollisions } from '../numbers';
 import { transliterate } from '../translit';
 
 const amounts = (t: string) => findAmounts(tokenize(t)).map((s) => s.value);
@@ -66,5 +66,11 @@ describe('spoken money', () => {
 
   it('formats rupees in the Indian system', () => {
     expect(formatRupees(150000)).toBe('₹1,50,000');
+  });
+});
+
+describe('number tables', () => {
+  it('never give one spoken word two different values', () => {
+    expect(vocabCollisions()).toEqual([]);
   });
 });

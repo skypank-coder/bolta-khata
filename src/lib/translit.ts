@@ -99,7 +99,7 @@ export function transliterate(input: string): string {
   //  - silent between vowel+consonant and consonant+vowel ("कितना" -> kitnaa, "पिछली" -> pichhlee)
   out = out.replace(new RegExp(SCHWA + '(?=$|[^a-z\u0001])', 'g'), '');
   out = out.replace(
-    new RegExp(`([aeiou${SCHWA}])([bcdfghjklmnpqrstvwxyz]+)${SCHWA}(?=[bcdfghjklmnpqrstvwxyz]+[aeiou])`, 'g'),
+    new RegExp(`([aeiou${SCHWA}])([bcdfghjklmnpqrstvwxyz]+)${SCHWA}(?=[bcdfghjklmnpqrstvwxyz]+[aeiou${SCHWA}])`, 'g'),
     '$1$2',
   );
   return out.replace(new RegExp(SCHWA, 'g'), 'a');
