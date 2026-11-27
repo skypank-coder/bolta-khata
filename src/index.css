@@ -19,6 +19,17 @@ button { -webkit-tap-highlight-color: transparent; }
       linear-gradient(90deg, transparent 52px, rgba(158, 27, 31, 0.45) 52px, rgba(158, 27, 31, 0.45) 54px, transparent 54px),
       repeating-linear-gradient(180deg, transparent 0, transparent 43px, rgba(29, 39, 102, 0.16) 43px, rgba(29, 39, 102, 0.16) 44px);
   }
+  /* Cloth binding with white stitches down the spine of the register. */
+  .bound { position: relative; }
+  .bound::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 14px; z-index: 1;
+    background: linear-gradient(90deg, #6E1013, #9E1B1F 60%, #7d1417);
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.25);
+  }
+  .bound::after {
+    content: ''; position: absolute; left: 6px; top: 10px; bottom: 10px; width: 2px; z-index: 2;
+    background: repeating-linear-gradient(180deg, rgba(250, 239, 196, 0.85) 0 9px, transparent 9px 18px);
+  }
   .cloth {
     background-color: #9E1B1F;
     background-image:
@@ -27,6 +38,12 @@ button { -webkit-tap-highlight-color: transparent; }
   }
   .num { font-variant-numeric: tabular-nums; }
 }
+
+@keyframes page-turn {
+  0% { transform: perspective(1400px) rotateY(-70deg); transform-origin: left center; opacity: 0.2; }
+  100% { transform: perspective(1400px) rotateY(0deg); transform-origin: left center; opacity: 1; }
+}
+.page-turn { animation: page-turn 650ms cubic-bezier(.2,.8,.25,1) both; }
 
 @media print {
   body { background: white !important; font-size: 12px; }

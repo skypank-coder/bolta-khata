@@ -72,7 +72,7 @@ export function Khata({ app }: { app: App }) {
         const title = meetingId === 'history' ? k.history
           : `${k.meeting} ${new Date((opened ?? entries[0]).ts).toLocaleString(lang === 'en' ? 'en-IN' : 'hi-IN', { dateStyle: 'medium', timeStyle: 'short' })}`;
         return (
-          <section key={meetingId} className="ledger-paper overflow-hidden rounded-lg shadow-lg">
+          <section key={meetingId} className="ledger-paper bound overflow-hidden rounded-lg shadow-lg">
             <h3 className="border-b-2 border-bahi/30 bg-patra-deep/70 py-2 pl-16 font-display text-lg text-bahi">{title}</h3>
             <ol>
               {entries.map((e) => {

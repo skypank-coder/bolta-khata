@@ -188,6 +188,29 @@ function tone(freqs: number[], dur = 0.12, type: OscillatorType = 'sine', gain =
 
 /** Bell-like rising notes: entry written into the khata. */
 export const cueSaved = () => tone([660, 880, 1320], 0.1, 'triangle');
+/** A rubber stamp landing on paper: a short low thump. */
+export function cueStamp() {
+  try {
+    audio ??= new AudioContext();
+    const ctx = audio;
+    const len = Math.floor(ctx.sampleRate * 0.12);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 260;
+    const g = ctx.createGain();
+    g.gain.value = 0.9;
+    src.connect(lp).connect(g).connect(ctx.destination);
+    src.start();
+  } catch {
+    // no audio output
+  }
+}
+
 /** One soft note: your turn to speak. */
 export const cueListen = () => tone([740], 0.09, 'sine', 0.05);
 /** Low double note: something is wrong or was not heard. */

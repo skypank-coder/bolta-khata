@@ -73,7 +73,10 @@ export function Sabha({ app }: { app: App }) {
     <div className="mx-auto grid w-full max-w-6xl gap-5 px-4 pb-48 pt-4 lg:grid-cols-[minmax(0,1fr)_420px]">
       <section className="min-w-0">
         {/* What the app just said, and what it heard */}
-        <div className="ledger-paper overflow-hidden rounded-t-xl rounded-b-md shadow-[0_10px_0_-4px_#F1DE96,0_20px_0_-8px_#E7CF7C,0_24px_40px_rgba(0,0,0,.35)]">
+        <div
+          key={mstate.meetingId ?? 'none'}
+          className="ledger-paper bound page-turn overflow-hidden rounded-t-xl rounded-b-md shadow-[0_10px_0_-4px_#F1DE96,0_20px_0_-8px_#E7CF7C,0_24px_40px_rgba(0,0,0,.35)]"
+        >
           <div className="flex items-center justify-between gap-3 border-b-2 border-bahi/30 bg-patra-deep/70 py-2 pl-16 pr-4 text-sm">
             <span className="font-semibold text-bahi">{t.phase[phaseKey]}</span>
             <span className="num text-neel-soft">

@@ -133,7 +133,7 @@ export function Report({ app }: { app: App }) {
         <button type="button" onClick={() => downloadCsv(data, rows, date)} className="rounded-lg px-4 py-2.5 font-semibold text-patra ring-1 ring-patra/40">{r.csv}</button>
       </div>
 
-      <article className="ledger-paper rounded-lg p-5 pl-16 shadow-lg print:shadow-none">
+      <article className="ledger-paper bound rounded-lg p-5 pl-16 shadow-lg print:shadow-none">
         <header className="flex flex-wrap items-end justify-between gap-3 border-b-2 border-bahi/30 pb-3">
           <div>
             <h1 className="font-display text-3xl text-bahi">{r.title}</h1>

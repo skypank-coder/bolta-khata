@@ -3,7 +3,7 @@ import { appendEntries, computeBalances, verifyChain, type ChainReport, type Led
 import { initialState, resumeState, step, type MeetingState, type Reply } from './lib/meeting';
 import { DEMO_SCRIPT, render, SPEECH_LANG, type Rendered } from './lib/phrases';
 import {
-  cueError, cueListen, cueSaved, listen, micLevel, speak, stopSpeaking, sttSupported,
+  cueError, cueListen, cueSaved, cueStamp, listen, micLevel, speak, stopSpeaking, sttSupported,
   type Heard, type ListenError, type ListenHandle,
 } from './lib/speech';
 import { buildDemoData, buildNewGroup, loadData, saveData, type AppData, type Lang } from './lib/store';
@@ -117,7 +117,10 @@ export function useBoltaKhata() {
     setExchanges((xs) => [...xs.slice(-30), { id, heard: shownAs ?? heard.text, reply: r.reply, rendered }]);
     if (SAVED_KEYS.has(r.reply.key)) {
       cueSaved();
-      if (r.reply.key === 'saved' || r.reply.key === 'loanSaved') setStampKey((k) => k + 1);
+      if (r.reply.key === 'saved' || r.reply.key === 'loanSaved') {
+        setStampKey((k) => k + 1);
+        setTimeout(cueStamp, 260); // lands with the stamp animation
+      }
     } else if (ERROR_KEYS.has(r.reply.key)) {
       cueError();
     }
