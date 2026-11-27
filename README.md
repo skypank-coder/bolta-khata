@@ -8,7 +8,7 @@
 *Now every one of them can hear it.*
 
 ![Voice-first](https://img.shields.io/badge/voice--first-Hindi%20%C2%B7%20Marathi%20%C2%B7%20English-9E1B1F?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-152%20passing-1C7A48?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-154%20passing-1C7A48?style=for-the-badge)
 ![Keys needed](https://img.shields.io/badge/API%20keys-none-1D2766?style=for-the-badge)
 ![Offline](https://img.shields.io/badge/works-offline%20%2B%20cloud-E0A100?style=for-the-badge)
 
@@ -31,6 +31,26 @@
 </tr>
 </table>
 
+## Try it the way judges will: one click, Sakhi shows you around
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screens/sakhi-site.jpg" alt="Sakhi Didi, an illustrated guide, spotlights the live meeting on the website and explains it aloud"></td>
+<td width="50%"><img src="docs/screens/sakhi-meeting.jpg" alt="Sakhi spotlights the meeting screen's reply area and explains it, with next, back, replay and skip buttons"></td>
+</tr>
+<tr>
+<td align="center"><b>Sakhi Didi</b> greets you on the website and walks through it, speaking each step aloud.</td>
+<td align="center">After one click, she shows the meeting screen: mic, reply, coach, circle, tabs, help.</td>
+</tr>
+</table>
+
+1. Open the site and press **▶ एक क्लिक में आज़माइए** (*Try it in one click*). No number, no form.
+2. A **guest account** and a **saved group** of 12 members with 14 months of history are created on the server, and the meeting opens.
+3. **Sakhi Didi**, an original illustrated guide, spotlights each part of the screen and explains it aloud in your language (she blinks, waves, and her mouth moves as she speaks). She moves on by herself, or you go back, replay or skip; she can be called back any time.
+4. Run the meeting by voice. Like it? On the dashboard, **keep the account** by adding a mobile number and a PIN; unclaimed guests are removed after 3 days.
+
+**Two-screen demo:** in the group's menu, copy the 6-letter code. In a second browser (or phone), sign in, *follow a group with a code*, and open it: it shows **LIVE**, and every entry made on the first screen appears within seconds, coins flying into the pot.
+
 ## A real product: website, accounts, dashboard, cloud
 
 <table>
@@ -48,7 +68,8 @@
 |---|---|
 | **Accounts** | Mobile number + 4–6 digit PIN, like UPI. PINs stored only as scrypt hashes; sessions are random tokens kept only as hashes, in HttpOnly cookies; five wrong PINs lock the number for ten minutes. |
 | **Many groups** | One person can run several groups. Create one empty (with the cash carried over) or pre-filled with demo members to try it. |
-| **Roles** | The leader's phone writes. A six-letter **join code** lets an NGO worker, CRP or bank officer **follow** a group read-only and see all their groups on one dashboard. |
+| **Roles** | The leader's phone writes. A six-letter **join code** lets an NGO worker, CRP or bank officer **follow** a group read-only, **live**, and see all their groups on one dashboard. |
+| **Guest trials** | One click makes a working guest account and group; it can be claimed with a real number later; unclaimed guests are swept after 3 days; 30 trials per address per hour. |
 | **Offline-first sync** | Each group's khata lives on the phone and works without signal; new entries go to the server a moment after they are written and again when the network returns. If two phones ever split, the server's copy is kept and the phone is told. |
 | **Tamper-proof on the server too** | The server stores the ledger append-only and re-verifies the SHA-256 chain on every sync. It refuses a quietly edited entry, even from the owner. |
 | **One container** | Website + API + SQLite in one Node process using only built-in modules. Data lives on a Docker volume. No keys, no external database. |
