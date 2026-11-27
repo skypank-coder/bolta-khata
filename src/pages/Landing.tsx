@@ -39,14 +39,14 @@ export function Landing({ user, go }: { user: User | null; go: (to: string) => v
               <button
                 type="button"
                 onClick={() => go(user ? '/groups' : '/signup')}
-                className="min-h-[56px] rounded-xl bg-haldi px-6 font-display text-2xl text-bahi-dark shadow-[0_5px_0_#8a6200] active:translate-y-1"
+                className="min-h-[56px] whitespace-nowrap rounded-xl bg-haldi px-5 font-display text-xl text-bahi-dark shadow-[0_5px_0_#8a6200] active:translate-y-1"
               >
                 {user ? s.hero.open : s.hero.primary}
               </button>
               <button
                 type="button"
                 onClick={() => go('/demo')}
-                className="min-h-[56px] rounded-xl bg-patra px-6 font-display text-2xl text-bahi shadow-[0_5px_0_#4a0a0c] active:translate-y-1"
+                className="min-h-[56px] whitespace-nowrap rounded-xl bg-patra px-5 font-display text-xl text-bahi shadow-[0_5px_0_#4a0a0c] active:translate-y-1"
               >
                 ▶ {s.hero.secondary}
               </button>

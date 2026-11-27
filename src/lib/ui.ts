@@ -95,7 +95,7 @@ const hi = {
     newGroupConfirm: 'अभी का खाता हटकर नया समूह बनेगा। पक्का?',
     resetConfirm: 'सारा खाता मिटाकर डेमो ग्रुप फिर से बनेगा। पक्का?',
     voiceMissing: 'इस फ़ोन में इस भाषा की आवाज़ नहीं है, इसलिए हिंदी आवाज़ में बोलेगा।',
-    privacy: 'सारा खाता इसी फ़ोन पर रहता है। किसी सर्वर पर नहीं जाता।',
+    privacy: 'खाता इस फ़ोन पर रहता है और बिना नेटवर्क के भी चलता है। डेमो कहीं नहीं भेजा जाता; खाते वाले समूह ऑनलाइन भी सुरक्षित रहते हैं।',
   },
 };
 
@@ -192,7 +192,7 @@ const mr: Strings = {
     newGroupConfirm: 'आत्ताचं खाते काढून नवीन गट तयार होईल. नक्की?',
     resetConfirm: 'सगळं खाते पुसून डेमो गट पुन्हा तयार होईल. नक्की?',
     voiceMissing: 'या फोनमध्ये मराठी आवाज नाही, त्यामुळे हिंदी आवाजात बोलेल.',
-    privacy: 'सगळं खाते याच फोनवर राहतं. कोणत्याही सर्व्हरवर जात नाही.',
+    privacy: 'खाते या फोनवर राहतं आणि नेटवर्कशिवायही चालतं. डेमो कुठेही पाठवला जात नाही; खात्यातील गट ऑनलाइनही सुरक्षित राहतात.',
   },
 };
 
@@ -290,7 +290,7 @@ const en: Strings = {
     newGroupConfirm: 'This replaces the current ledger with a new group. Continue?',
     resetConfirm: 'This wipes the ledger and rebuilds the demo group. Continue?',
     voiceMissing: 'This phone has no voice for this language, so replies use the Hindi voice.',
-    privacy: 'The whole ledger stays on this phone. Nothing is sent to a server.',
+    privacy: 'The ledger lives on this phone and works with no signal. The demo is never sent anywhere; groups in an account are also saved online.',
   },
 };
 

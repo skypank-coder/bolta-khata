@@ -8,9 +8,9 @@
 *Now every one of them can hear it.*
 
 ![Voice-first](https://img.shields.io/badge/voice--first-Hindi%20%C2%B7%20Marathi%20%C2%B7%20English-9E1B1F?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-139%20passing-1C7A48?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-152%20passing-1C7A48?style=for-the-badge)
 ![Keys needed](https://img.shields.io/badge/API%20keys-none-1D2766?style=for-the-badge)
-![Offline](https://img.shields.io/badge/works-offline-E0A100?style=for-the-badge)
+![Offline](https://img.shields.io/badge/works-offline%20%2B%20cloud-E0A100?style=for-the-badge)
 
 **India Runs on Voice** hackathon (Scaler × Wispr Flow) · Theme: *Livelihoods and small business*
 
@@ -30,6 +30,28 @@
 <td align="center"><b>Close.</b> Count the cash box by voice. ₹100 short? It is said out loud and locked in.</td>
 </tr>
 </table>
+
+## A real product: website, accounts, dashboard, cloud
+
+<table>
+<tr>
+<td width="55%"><img src="docs/screens/website.jpg" alt="The Bolta Khata website: Hindi headline, a meeting playing in the hero with the member's words highlighted, sign-up and demo buttons, and key numbers"></td>
+<td width="45%"><img src="docs/screens/dashboard.jpg" alt="The groups dashboard: each group as a register card with cash, savings, loans out, last meeting, ledger intact badge and join code"></td>
+</tr>
+<tr>
+<td align="center"><b>Website</b> in Hindi, Marathi and English, with a meeting playing live in the hero.</td>
+<td align="center"><b>Dashboard</b> of every group you run or follow, with live figures.</td>
+</tr>
+</table>
+
+| | |
+|---|---|
+| **Accounts** | Mobile number + 4–6 digit PIN, like UPI. PINs stored only as scrypt hashes; sessions are random tokens kept only as hashes, in HttpOnly cookies; five wrong PINs lock the number for ten minutes. |
+| **Many groups** | One person can run several groups. Create one empty (with the cash carried over) or pre-filled with demo members to try it. |
+| **Roles** | The leader's phone writes. A six-letter **join code** lets an NGO worker, CRP or bank officer **follow** a group read-only and see all their groups on one dashboard. |
+| **Offline-first sync** | Each group's khata lives on the phone and works without signal; new entries go to the server a moment after they are written and again when the network returns. If two phones ever split, the server's copy is kept and the phone is told. |
+| **Tamper-proof on the server too** | The server stores the ledger append-only and re-verifies the SHA-256 chain on every sync. It refuses a quietly edited entry, even from the owner. |
+| **One container** | Website + API + SQLite in one Node process using only built-in modules. Data lives on a Docker volume. No keys, no external database. |
 
 ## Anyone can use it, without being taught
 
@@ -54,10 +76,10 @@ A test walks real meetings in all three languages and **tries every phrase the c
 docker compose up --build
 ```
 
-Open **http://localhost:3000** in Chrome. Then either:
+Open **http://localhost:3000** in Chrome. You land on the website. Then either:
 
-- 🎙️ **tap the mic** and say *"मीटिंग शुरू करो"*, or
-- ▶️ press **"पूरी डेमो मीटिंग चलाइए"** (*Play a full demo meeting*) and watch a whole meeting run itself, by voice, with no mic needed.
+- ▶️ **बिना खाते के डेमो देखिए** (*Watch the demo, no account*): the meeting app with a demo group, where **पूरी डेमो मीटिंग चलाइए** plays a whole meeting by itself, or
+- **मुफ़्त खाता** (*Free account*): sign up with any 10-digit mobile number and a PIN, create a group (tick *start with 12 demo members* to try it), and run a meeting by voice. It saves to the server as you go.
 
 The first screen asks for a language (**हिंदी · मराठी · English**), explains the idea in three lines, and offers the demo or your own meeting. On a laptop, **Space** talks and **Esc** stops.
 
@@ -70,9 +92,12 @@ No keys. No `.env`. No sign-up. No server.
 
 ```bash
 npm install
-npm run dev     # http://localhost:3000
-npm test        # 124 tests
+npm run dev:api   # API + SQLite on :8787 (Node 22.18+ runs the TypeScript directly)
+npm run dev       # website on http://localhost:3000, /api proxied to :8787
+npm test          # 152 tests
 ```
+
+Production without Docker: `npm run build && npm start` serves everything on port 3000. Optional settings are in `.env.example`; none are required.
 </details>
 
 ---
@@ -169,7 +194,7 @@ Start your own group, then *"नया सदस्य जोड़ो: पु�
 
 ### 🌳 10. Built for a meeting under a tree
 - **Hands-free**: tap once; it listens, answers and listens again for the whole meeting.
-- **Offline**: installable PWA; the ledger lives on the phone (IndexedDB). Nothing is sent to any server.
+- **Offline-first**: installable PWA; the ledger lives on the phone (IndexedDB) and works with no signal. The demo never leaves the phone; a signed-in group is also saved to the server.
 - **Three languages**, and Hindi/Marathi spoken in Devanagari by the phone's own voice.
 - **Live mic-level ring**, so speakers can see they are being heard.
 
@@ -181,7 +206,7 @@ Meeting report (print / save as PDF), CSV for the federation or bank, and a rece
 ## Stress-tested, not demo-tested
 
 ```
- 139 tests · all passing
+ 152 tests · all passing
  ├─ 91,000  spoken Hindi amounts (10 → 99,999) parsed back exactly
  ├─  2,000  random amounts × 3 formats (₹, rs, Indian digit grouping)
  ├─    600  seeded random meetings × 45 noisy utterances each
@@ -192,6 +217,9 @@ Meeting report (print / save as PDF), CSV for the federation or bank, and a rece
  │          no member ever added twice
  ├─      3  full demo meetings (Hindi, Marathi, English) through the real engine
  ├─      3  coach walks: every suggested phrase, in every state, in every language
+ ├─      7  API tests over real HTTP: sign-up, PIN lockout, groups, sync,
+ │          tampered entry refused, stale copy refused, read-only followers
+ ├─      4  phone ↔ server merge cases
  └─     ...  every example sentence shown on screen, in every language
 ```
 
@@ -224,6 +252,8 @@ flowchart LR
   SM --> LED["🔒 Hash-chained ledger<br/>SHA-256 · reversals · cash counts"]
   LED --> DB[("📱 IndexedDB<br/>on the phone")]
   LED --> OUT["📄 Report · CSV · 🧾 receipts"]
+  DB <-->|"sync: append-only,<br/>chain re-verified"| API["☁️ Node API<br/>accounts · groups · roles"]
+  API --> SQL[("SQLite<br/>Docker volume")]
 ```
 
 The heart is `step(state, heard, ledger) → (state, reply, entries)`: a pure function with no timers, audio or storage, which is why a whole meeting can be replayed in a test.
@@ -238,7 +268,12 @@ The heart is `step(state, heard, ledger) → (state, reply, entries)`: a pure fu
 | [`src/lib/ledger.ts`](src/lib/ledger.ts) | Hash chain, reversals, balances |
 | [`src/lib/phrases.ts`](src/lib/phrases.ts) | Everything it says, in three languages, plus the demo scripts |
 | [`src/lib/speech.ts`](src/lib/speech.ts) | Listening, speaking, sound cues, mic level |
-| [`src/useBoltaKhata.ts`](src/useBoltaKhata.ts) | Hands-free loop, queued turns, demo player |
+| [`src/useBoltaKhata.ts`](src/useBoltaKhata.ts) | Hands-free loop, queued turns, demo player, cloud sync |
+| [`src/lib/sync.ts`](src/lib/sync.ts) | Merging the phone's and the server's copy of a khata |
+| [`server/app.ts`](server/app.ts) | The API: accounts, groups, join codes, append-only sync with chain checks |
+| [`server/auth.ts`](server/auth.ts) | scrypt PINs, session tokens, lockout after wrong PINs |
+| [`server/db.ts`](server/db.ts) | SQLite schema (Node's built-in `node:sqlite`) |
+| [`src/pages/`](src/pages) | Website, sign-in and the groups dashboard |
 
 ---
 
@@ -248,7 +283,8 @@ The heart is `step(state, heard, ledger) → (state, reply, entries)`: a pure fu
 |---|---|---|
 | Browser speech recognition (Chrome / Android) | Speech → text | Free today, needs internet. The engine only needs text, so an on-device model or an Indian speech API (Bhashini, Sarvam) can be dropped in behind `listen()`. Typing and buttons always work offline. |
 | Browser speech synthesis | Speaking replies | Free, on-device. Missing a Marathi voice? Falls back to Hindi and still shows the text. |
-| **Nothing else** | | **No paid AI model, no server, no database.** ₹0 per meeting. |
+| Our own Node server + SQLite | Accounts, groups, cloud copy of each khata | Built-in modules only, runs anywhere Docker runs. If it is down, meetings carry on offline and sync later. |
+| **Nothing paid** | | **No AI API, no paid speech, no external database.** ₹0 per meeting. |
 
 ## Accessibility
 

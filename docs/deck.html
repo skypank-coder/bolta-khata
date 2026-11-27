@@ -116,9 +116,9 @@
       <li>Tamper-evident ledger: each entry is locked to the previous one with SHA-256. A quiet edit turns the ledger red at that entry.</li>
       <li>Mistakes are cancelled by reversal entries, never deleted.</li>
       <li>Bank report (PDF), CSV, receipts read aloud or sent on WhatsApp.</li>
-      <li>Works offline as an installable app. Data stays on the phone.</li>
+      <li>Works offline as an installable app; saved online when there is signal.</li>
       <li>Cash box counted by voice; any shortfall is announced and locked in.</li>
-      <li>139 tests: 91,000 spoken amounts, 600 random noisy meetings; 8 bugs found and fixed.</li>
+      <li>Live product: website, mobile + PIN accounts, groups dashboard, offline-first cloud sync; 152 tests.</li>
     </ul>
   </div>
 </section>
@@ -145,8 +145,8 @@
     <tr><th style="width:26%">Dependency</th><th style="width:30%">Used for</th><th>If it gets costly or stops working</th></tr>
     <tr><td>Browser speech recognition (Chrome, Android)</td><td>Speech to text in hi-IN, mr-IN, en-IN</td><td>Free today, but needs internet. The engine only needs text, so an on-device model or an Indian speech API (Bhashini, Sarvam) can be swapped in behind one function. Typing and tap buttons always work, offline.</td></tr>
     <tr><td>Browser speech synthesis</td><td>Speaking replies</td><td>Free and on-device. If a language voice is missing, it uses the Hindi voice and still shows the text.</td></tr>
-    <tr><td>No AI model, no server</td><td>Parsing, name matching, ledger</td><td>All rule-based and on the phone: no per-meeting cost, no outage risk, and no invented amounts.</td></tr>
-    <tr><td>Phone storage (IndexedDB)</td><td>The ledger</td><td>Next: encrypted backup and sync to the village organisation, and export in LokOS format.</td></tr>
+    <tr><td>No AI model</td><td>Parsing, name matching, ledger</td><td>All rule-based and on the phone: no per-meeting cost, no outage risk, and no invented amounts.</td></tr>
+    <tr><td>Our own server (Node + SQLite)</td><td>Accounts, groups, cloud copy, dashboard</td><td>Built-in modules only, one container. If it is down, meetings carry on offline on the phone and sync later.</td></tr>
   </table>
 </section>
 
@@ -160,7 +160,7 @@
       <li><b>One-meeting onboarding</b>: the leader learns three sentences; the app teaches the rest by voice.</li>
     </ol>
     <ol start="4">
-      <li><b>Grow</b> through cluster-level federations and State Rural Livelihood Missions, where one resource person serves dozens of groups.</li>
+      <li><b>Grow</b> through cluster-level federations and State Rural Livelihood Missions: one resource person follows dozens of groups on one dashboard with join codes.</li>
       <li><b>Fit in</b>: export to LokOS and bank formats, so it adds to existing systems instead of replacing them.</li>
       <li><b>Free for groups</b>; paid per group per year by missions, NGOs or banks that want reliable records.</li>
     </ol>
