@@ -150,3 +150,29 @@ describe('one-click guest trial', () => {
     expect((await g('GET', '/api/me')).status).toBe(401);
   });
 });
+
+describe('hardening', () => {
+  it('refuses well-hashed but nonsensical entries (negative money, unknown types)', async () => {
+    const leader = phone();
+    await leader('POST', '/api/auth/signup', { phone: '9876500030', name: 'L', pin: '1234' });
+    const demo = await buildDemoData();
+    const { json } = await leader('POST', '/api/groups', { name: 'G', village: '', members: demo.group.members, entries: demo.ledger });
+    // Correct hashes over bad content: the chain alone would accept these.
+    const negative = await appendEntries(demo.ledger, [{ type: 'savings', memberId: 'm01', amount: -500, meetingId: 'x' }]);
+    const weird = await appendEntries(demo.ledger, [{ type: 'gift' as never, memberId: 'm01', amount: 5, meetingId: 'x' }]);
+    const base = demo.ledger.at(-1)!.seq;
+    expect((await leader('POST', `/api/groups/${json.id}/sync`, { baseSeq: base, entries: negative.slice(-1) })).json.error).toBe('bad_entries');
+    expect((await leader('POST', `/api/groups/${json.id}/sync`, { baseSeq: base, entries: weird.slice(-1) })).json.error).toBe('bad_entries');
+  });
+
+  it('accepts only JSON on write routes', async () => {
+    const res = await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: '{"phone":"9876500001","pin":"4321"}' });
+    expect(res.status).toBe(415);
+  });
+
+  it('sends safe headers', async () => {
+    const res = await fetch(base + '/api/health');
+    expect(res.headers.get('x-content-type-options')).toBe('nosniff');
+    expect(res.headers.get('cache-control')).toBe('no-store');
+  });
+});

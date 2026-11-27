@@ -43,12 +43,17 @@ class HttpError extends Error {
 }
 
 function send(res: ServerResponse, status: number, data: unknown, headers: Record<string, string> = {}) {
-  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...headers });
+  res.writeHead(status, {
+    'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', ...headers,
+  });
   res.end(JSON.stringify(data));
 }
 
 async function readBody(req: IncomingMessage): Promise<Json> {
   if (req.method === 'GET' || req.method === 'HEAD') return {};
+  const type = req.headers['content-type'] ?? '';
+  if (req.headers['content-length'] !== '0' && type && !type.startsWith('application/json')) throw new HttpError(415, 'json_only');
   let size = 0;
   const chunks: Buffer[] = [];
   for await (const chunk of req) {
@@ -124,8 +129,30 @@ function cleanMembers(raw: unknown): Json[] {
  * New entries must continue the chain exactly where the server's copy ends, and every
  * hash must match its content. Even the server cannot accept a quietly edited entry.
  */
+const ENTRY_TYPES = new Set(['opening', 'savings', 'repayment', 'loan', 'reversal', 'meeting_open', 'meeting_close',
+  'attendance', 'cash_count', 'member_join']);
+const MAX_ENTRIES_PER_SYNC = 5000;
+const MAX_AMOUNT = 1_00_00_000; // ₹1 crore: far above any SHG transaction
+
+/** A correctly hashed entry can still be nonsense; check every field is the right kind of thing. */
+function wellFormed(e: unknown): e is LedgerEntry {
+  if (!e || typeof e !== 'object') return false;
+  const x = e as Record<string, unknown>;
+  const optStr = (v: unknown, max = 200) => v === undefined || v === null || (typeof v === 'string' && v.length <= max);
+  return typeof x.id === 'string' && x.id.length <= 64
+    && Number.isInteger(x.seq) && (x.seq as number) > 0
+    && typeof x.ts === 'string' && !Number.isNaN(Date.parse(x.ts))
+    && typeof x.type === 'string' && ENTRY_TYPES.has(x.type)
+    && typeof x.amount === 'number' && Number.isFinite(x.amount) && x.amount >= 0 && x.amount <= MAX_AMOUNT
+    && optStr(x.memberId, 64) && optStr(x.meetingId, 64) && optStr(x.reverses, 64)
+    && optStr(x.spoken, 500) && optStr(x.note, 500)
+    && typeof x.hash === 'string' && /^[0-9a-f]{64}$/.test(x.hash)
+    && typeof x.prevHash === 'string' && /^[0-9a-f]{64}$/.test(x.prevHash);
+}
+
 async function checkContinuation(existing: LedgerEntry[], incoming: unknown): Promise<LedgerEntry[]> {
-  if (!Array.isArray(incoming)) throw new HttpError(400, 'bad_entries');
+  if (!Array.isArray(incoming) || incoming.length > MAX_ENTRIES_PER_SYNC) throw new HttpError(400, 'bad_entries');
+  if (!incoming.every(wellFormed)) throw new HttpError(400, 'bad_entries');
   const entries = incoming as LedgerEntry[];
   const report = await verifyChain([...existing, ...entries]);
   if (!report.ok) throw new HttpError(400, 'chain_broken');
@@ -156,6 +183,8 @@ function tx<T>(db: DB, fn: () => T): T {
 const limiter = new LoginLimiter();
 /** Guest trials per address per hour, so one-click accounts cannot be farmed. */
 const guestLimiter = new LoginLimiter(30, 60 * 60 * 1000);
+/** New accounts per address per hour. */
+const signupLimiter = new LoginLimiter(20, 60 * 60 * 1000);
 const GUEST_DAYS = 3;
 const isGuest = (u: User) => u.phone.startsWith('guest:');
 const publicUser = (u: User) => ({ id: u.id, name: u.name, phone: isGuest(u) ? '' : u.phone, guest: isGuest(u) });
@@ -175,7 +204,10 @@ type Handler = (c: Ctx) => Promise<void> | void;
 const routes: Array<[string, RegExp, Handler]> = [
   ['GET', /^\/api\/health$/, ({ res }) => send(res, 200, { ok: true, time: new Date().toISOString() })],
 
-  ['POST', /^\/api\/auth\/signup$/, async ({ db, res, body }) => {
+  ['POST', /^\/api\/auth\/signup$/, async ({ db, req, res, body }) => {
+    const ip = req.socket.remoteAddress ?? '';
+    if (signupLimiter.blocked(ip)) throw new HttpError(429, 'too_many_tries');
+    signupLimiter.fail(ip);
     const phone = normalisePhone(body.phone);
     const name = typeof body.name === 'string' ? body.name.trim().slice(0, 80) : '';
     if (!phone) throw new HttpError(400, 'bad_phone');
@@ -354,6 +386,8 @@ function serveStatic(res: ServerResponse, distDir: string, urlPath: string) {
     'Cache-Control': immutable ? 'public, max-age=31536000, immutable' : 'no-cache',
     'Permissions-Policy': 'microphone=(self)',
     'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'same-origin',
+    'X-Frame-Options': 'SAMEORIGIN',
   });
   res.end(readFileSync(file));
 }
