@@ -68,7 +68,7 @@ function hi(r: Reply, f: Fmt): string {
       return `${r.presentCount} लोग हाज़िर।${r.absent.length ? ` ${f.list(r.absent)} नहीं आईं।` : ' सब आ गईं।'} अब अपना नाम, बचत और किस्त बोलिए।`;
     case 'readback': {
       const after = Object.entries(r.after).filter(() => r.drafts.some((d) => d.type === 'repayment')).map(([id, v]) =>
-        ` ${f.name(id)} का बाकी लोन ${f.money(Math.max(v, 0))}।`).join('');
+        v > 0 ? ` ${f.name(id)} का बाकी लोन ${f.money(v)}।` : ` ${f.name(id)} का लोन पूरा चुक गया।`).join('');
       const loan = r.loanAfter ? ` फिर ${f.money(r.loanAfter.amount)} का लोन।` : '';
       if (r.stage === 2) return `ध्यान से सुनिए। ${lines(r.drafts, 'hi', f)}।${after} पक्का सही है?`;
       const warn = r.warn === 'overpay' ? ' किस्त बाकी लोन से ज़्यादा थी, इसलिए लोन पूरा चुका और बाकी पैसा बचत में गया।' : r.warn === 'large' ? ' रकम बड़ी है।' : '';
@@ -126,7 +126,7 @@ function mr(r: Reply, f: Fmt): string {
       return `${r.presentCount} जणी हजर.${r.absent.length ? ` ${f.list(r.absent)} आल्या नाहीत.` : ' सगळ्या आल्या.'} आता नाव, बचत आणि हप्ता सांगा.`;
     case 'readback': {
       const after = Object.entries(r.after).filter(() => r.drafts.some((d) => d.type === 'repayment')).map(([id, v]) =>
-        ` ${f.name(id)} यांचं बाकी कर्ज ${f.money(Math.max(v, 0))}.`).join('');
+        v > 0 ? ` ${f.name(id)} यांचं बाकी कर्ज ${f.money(v)}.` : ` ${f.name(id)} यांचं कर्ज पूर्ण फिटलं.`).join('');
       const loan = r.loanAfter ? ` नंतर ${f.money(r.loanAfter.amount)} कर्ज.` : '';
       if (r.stage === 2) return `नीट ऐका. ${lines(r.drafts, 'mr', f)}.${after} नक्की बरोबर?`;
       const warn = r.warn === 'overpay' ? ' हप्ता बाकी कर्जापेक्षा जास्त होता, म्हणून कर्ज पूर्ण फिटलं आणि उरलेले पैसे बचतीत गेले.' : r.warn === 'large' ? ' रक्कम मोठी आहे.' : '';
@@ -184,7 +184,7 @@ function en(r: Reply, f: Fmt): string {
       return `${r.presentCount} present.${r.absent.length ? ` ${f.list(r.absent)} did not come.` : ' Everyone is here.'} Now say your name, savings and repayment.`;
     case 'readback': {
       const after = Object.entries(r.after).filter(() => r.drafts.some((d) => d.type === 'repayment')).map(([id, v]) =>
-        ` ${f.name(id)} still owes ${f.money(Math.max(v, 0))}.`).join('');
+        v > 0 ? ` ${f.name(id)} still owes ${f.money(v)}.` : ` ${f.name(id)}'s loan is fully repaid.`).join('');
       const loan = r.loanAfter ? ` Then a loan of ${f.money(r.loanAfter.amount)}.` : '';
       if (r.stage === 2) return `Listen carefully. ${lines(r.drafts, 'en', f)}.${after} Are you sure?`;
       const warn = r.warn === 'overpay' ? ' That is more than the loan left, so the loan is closed and the rest goes to savings.' : r.warn === 'large' ? ' This is a large amount.' : '';

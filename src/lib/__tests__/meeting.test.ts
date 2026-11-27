@@ -349,3 +349,15 @@ describe('adding members by voice', () => {
     expect(r.reply.key).toBe('noMembers');
   });
 });
+
+describe('read-back wording', () => {
+  it('says a loan is fully repaid instead of "owes ₹0"', async () => {
+    const { render } = await import('../phrases');
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    const r = await m.say('Rekha ki kist 1500');
+    expect(render(r, 'hi', m.members).say).toContain('लोन पूरा चुक गया');
+    expect(render(r, 'en', m.members).say).toContain('fully repaid');
+    expect(render(r, 'en', m.members).say).not.toContain('owes');
+  });
+});
