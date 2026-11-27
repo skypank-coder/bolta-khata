@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { appendEntries, computeBalances, verifyChain, type ChainReport, type LedgerEntry } from './lib/ledger';
 import { initialState, resumeState, step, type MeetingState, type Reply } from './lib/meeting';
 import { DEMO_SCRIPT, render, SPEECH_LANG, type Rendered } from './lib/phrases';
+import { milestoneOf } from './lib/coach';
 import {
   cueError, cueListen, cueSaved, cueStamp, listen, micLevel, speak, stopSpeaking, sttSupported,
   type Heard, type ListenError, type ListenHandle,
@@ -98,6 +99,10 @@ export function useBoltaKhata() {
       }
       if (r.drafts.length) {
         next = { ...next, ledger: await appendEntries(next.ledger, r.drafts) };
+      }
+      const ms = milestoneOf(r.reply);
+      if (ms && !demoRef.current && !next.settings.learned?.includes(ms)) {
+        next = { ...next, settings: { ...next.settings, learned: [...(next.settings.learned ?? []), ms] } };
       }
       if (next !== current) commitData(next);
       return { r, next };

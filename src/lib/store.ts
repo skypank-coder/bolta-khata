@@ -26,6 +26,8 @@ export interface Settings {
   geminiKey?: string;
   /** Has seen the first-run welcome. */
   welcomed?: boolean;
+  /** What this group has already done once (shown as a learning ladder). */
+  learned?: string[];
 }
 
 export interface AppData {

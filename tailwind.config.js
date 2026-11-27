@@ -22,11 +22,13 @@ export default {
         },
         ink: { '0%': { clipPath: 'inset(0 100% 0 0)' }, '100%': { clipPath: 'inset(0 0 0 0)' } },
         write: { '0%': { clipPath: 'inset(0 100% 0 0)', opacity: '0.4' }, '100%': { clipPath: 'inset(0 0 0 0)', opacity: '1' } },
+        pop: { '0%': { transform: 'translateY(8px) scale(.97)', opacity: '0' }, '100%': { transform: 'none', opacity: '1' } },
       },
       animation: {
         stamp: 'stamp 420ms cubic-bezier(.2,.9,.3,1.2) both',
         ink: 'ink 600ms ease-out both',
         write: 'write 700ms steps(14, end) both',
+        pop: 'pop 380ms cubic-bezier(.2,.9,.3,1.15) both',
       },
     },
   },

@@ -7,6 +7,8 @@ import { Khata } from './screens/Khata';
 import { Report } from './screens/Report';
 import { Sabha } from './screens/Sabha';
 import { Welcome } from './components/Welcome';
+import { HelpSheet } from './components/HelpSheet';
+import type { Milestone } from './lib/coach';
 import { useBoltaKhata } from './useBoltaKhata';
 
 type Tab = 'sabha' | 'khata' | 'report';
@@ -15,6 +17,7 @@ export default function App() {
   const app = useBoltaKhata();
   const [tab, setTab] = useState<Tab>('sabha');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [voiceOk, setVoiceOk] = useState(true);
   const [newGroup, setNewGroup] = useState({ name: '', village: '', cash: '' });
   const { data, lang } = app;
@@ -50,6 +53,14 @@ export default function App() {
             <p className="font-display text-2xl leading-none text-patra">{t.appName}</p>
             <p className="truncate text-sm text-patra/75">{groupName}, {data.group.village}</p>
           </div>
+          <button
+            type="button"
+            onClick={() => setHelpOpen(true)}
+            className="flex h-11 items-center gap-1.5 rounded-lg bg-patra px-3 font-display text-lg text-bahi shadow-[0_3px_0_#4a0a0c]"
+          >
+            <span aria-hidden className="grid h-6 w-6 place-items-center rounded-full bg-bahi text-sm text-patra">?</span>
+            {t.help}
+          </button>
           <button
             type="button"
             onClick={() => setSettingsOpen((v) => !v)}
@@ -151,8 +162,18 @@ export default function App() {
         />
       )}
 
+      {helpOpen && (
+        <HelpSheet
+          lang={lang}
+          learned={(data.settings.learned ?? []) as Milestone[]}
+          onClose={() => setHelpOpen(false)}
+          onTry={(ph) => { setHelpOpen(false); setTab('sabha'); void app.say(ph); }}
+          onDemo={() => { setHelpOpen(false); setTab('sabha'); void app.playDemo(); }}
+        />
+      )}
+
       <main>
-        {tab === 'sabha' && <Sabha app={app} />}
+        {tab === 'sabha' && <Sabha app={app} onHelp={() => setHelpOpen(true)} />}
         {tab === 'khata' && <Khata app={app} />}
         {tab === 'report' && <Report app={app} />}
       </main>

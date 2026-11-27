@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { MicButton } from '../components/MicButton';
 import { RegisterPage } from '../components/RegisterPage';
+import { CoachStrip } from '../components/CoachStrip';
 import { SabhaCircle, type Today } from '../components/SabhaCircle';
+import { nextHint } from '../lib/coach';
 import { Understood } from '../components/Understood';
 import { meetingTotals, reversedIds } from '../lib/ledger';
-import { EXAMPLES } from '../lib/phrases';
 import { UI } from '../lib/ui';
 import type { useBoltaKhata } from '../useBoltaKhata';
 
 type App = ReturnType<typeof useBoltaKhata>;
 
-export function Sabha({ app }: { app: App }) {
+export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
   const { data, lang, mstate, status, interim, lastExchange, error, level, balances, stampKey } = app;
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState('');
@@ -78,7 +79,6 @@ export function Sabha({ app }: { app: App }) {
     : [];
 
   const phaseKey = mstate.phase === 'idle' ? 'idle' : mstate.phase;
-  const examples = EXAMPLES[lang][phaseKey];
   const listeningText = status === 'listening' ? interim || '…' : null;
 
   return (
@@ -133,6 +133,10 @@ export function Sabha({ app }: { app: App }) {
             )}
           </div>
 
+          <div className="px-4 pb-4 pl-16">
+            <CoachStrip hint={nextHint(mstate, members, lang)} label={t.nowSay} disabled={busy} onSay={(ph) => app.say(ph)} />
+          </div>
+
           <div className="border-t-2 border-bahi/30">
             <h2 className="py-2 pl-16 font-display text-lg text-bahi">{t.todayPage}</h2>
             <RegisterPage entries={today} allEntries={ledger} members={members} lang={lang} stampKey={stampKey} />
@@ -171,22 +175,14 @@ export function Sabha({ app }: { app: App }) {
           <p className="mt-1 hidden text-sm text-patra/80 lg:block">{t.keyHint}</p>
         </div>
 
-        <div>
-          <h2 className="mb-2 text-patra/80">{t.tryThese}</h2>
-          <div className="flex flex-wrap gap-2">
-            {examples.map((ex) => (
-              <button
-                key={ex}
-                type="button"
-                disabled={busy}
-                onClick={() => app.say(ex)}
-                className="min-h-[44px] rounded-full border border-patra/30 bg-bahi-dark/40 px-4 py-2 text-patra hover:bg-bahi-dark/70"
-              >
-                “{ex}”
-              </button>
-            ))}
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={onHelp}
+          className="flex w-full items-center gap-3 rounded-xl bg-patra p-4 text-left text-neel shadow-[0_4px_0_#4a0a0c] active:translate-y-0.5"
+        >
+          <span aria-hidden className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-neel font-display text-2xl text-patra">?</span>
+          <span className="font-display text-lg leading-snug">{t.howTo}</span>
+        </button>
       </aside>
 
       {/* Thumb zone: mic in the middle, the two switches beside it */}
