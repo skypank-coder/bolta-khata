@@ -120,18 +120,53 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   return voicesReady;
 }
 
-/** Prefer a voice for the exact language, then any Indian voice, then the default. */
-async function pickVoice(lang: string): Promise<SpeechSynthesisVoice | null> {
-  const voices = await loadVoices();
+/**
+ * How clear a voice is likely to sound. Neural "Natural/Online" voices (Edge: Swara,
+ * Madhur, Aarohi, Manohar) beat Google's online voices, which beat offline system voices.
+ */
+export function voiceScore(v: { name: string; lang: string; localService?: boolean }, lang: string): number {
   const base = lang.split('-')[0];
-  return (
-    voices.find((v) => v.lang === lang && /google/i.test(v.name)) ??
-    voices.find((v) => v.lang === lang) ??
-    voices.find((v) => v.lang.startsWith(base)) ??
-    (base !== 'en' ? voices.find((v) => v.lang === 'hi-IN') : undefined) ??
-    voices.find((v) => v.lang.endsWith('-IN')) ??
-    null
-  );
+  let score = 0;
+  if (v.lang === lang) score += 100;
+  else if (v.lang.startsWith(base)) score += 80;
+  else if (base !== 'en' && v.lang === 'hi-IN') score += 40; // Marathi text still reads well in a Hindi voice
+  else if (v.lang.endsWith('-IN')) score += 10;
+  else return 0;
+  if (/natural|neural/i.test(v.name)) score += 30;
+  if (/online/i.test(v.name)) score += 10;
+  if (/google/i.test(v.name)) score += 20;
+  if (/swara|madhur|aarohi|manohar|kalpana|hemant|heera|neerja|prabhat/i.test(v.name)) score += 5;
+  return score;
+}
+
+/** Voices worth offering for a language, clearest first. */
+export async function voicesFor(lang: string): Promise<SpeechSynthesisVoice[]> {
+  const voices = await loadVoices();
+  return voices.filter((v) => voiceScore(v, lang) > 0).sort((a, b) => voiceScore(b, lang) - voiceScore(a, lang));
+}
+
+/** This phone's own choice of voice and pace (a device setting, not group data). */
+export interface VoicePrefs { voice?: string; rate: number }
+const PREFS_KEY = 'bk.voice';
+
+export function loadVoicePrefs(): VoicePrefs {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (raw) return { rate: 0.95, ...JSON.parse(raw) };
+  } catch {
+    // storage blocked: use defaults
+  }
+  return { rate: 0.95 };
+}
+
+export function saveVoicePrefs(p: VoicePrefs): void {
+  try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch { /* ignore */ }
+}
+
+async function pickVoice(lang: string): Promise<SpeechSynthesisVoice | null> {
+  const ranked = await voicesFor(lang);
+  const wanted = loadVoicePrefs().voice;
+  return ranked.find((v) => v.name === wanted) ?? ranked[0] ?? null;
 }
 
 export async function voiceAvailable(lang: string): Promise<boolean> {
@@ -139,26 +174,47 @@ export async function voiceAvailable(lang: string): Promise<boolean> {
   return !!v && v.lang.startsWith(lang.split('-')[0]);
 }
 
+let speakToken = 0;
+
 export function stopSpeaking(): void {
+  speakToken++;
   if (ttsSupported()) speechSynthesis.cancel();
 }
 
-/** Speak and resolve when finished (or after a safety timeout, since some browsers never fire 'end'). */
-export async function speak(text: string, lang: string, rate = 0.92, pitch = 1): Promise<void> {
+/**
+ * Split a reply into sentences. Short utterances sound clearer, get a natural pause
+ * between them, and avoid Chrome cutting off speech after about 15 seconds.
+ */
+export function sentences(text: string): string[] {
+  return text
+    .split(/(?<=[।.?!])\s+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+/** Speak and resolve when finished. A newer call cancels an older one. */
+export async function speak(text: string, lang: string, rate?: number, pitch = 1): Promise<void> {
   if (!ttsSupported() || !text) return;
+  const token = ++speakToken;
   speechSynthesis.cancel();
   const voice = await pickVoice(lang);
-  await new Promise<void>((resolve) => {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = voice?.lang ?? lang;
-    if (voice) u.voice = voice;
-    u.rate = rate;
-    u.pitch = pitch;
-    const timeout = setTimeout(resolve, 2500 + text.length * 110);
-    u.onend = () => { clearTimeout(timeout); resolve(); };
-    u.onerror = () => { clearTimeout(timeout); resolve(); };
-    speechSynthesis.speak(u);
-  });
+  const pace = rate ?? loadVoicePrefs().rate;
+  for (const part of sentences(text)) {
+    if (token !== speakToken) return;
+    await new Promise<void>((resolve) => {
+      const u = new SpeechSynthesisUtterance(part);
+      u.lang = voice?.lang ?? lang;
+      if (voice) u.voice = voice;
+      u.rate = pace;
+      u.pitch = pitch;
+      const timeout = setTimeout(resolve, 2000 + part.length * 120 / pace);
+      u.onend = () => { clearTimeout(timeout); resolve(); };
+      u.onerror = () => { clearTimeout(timeout); resolve(); };
+      speechSynthesis.speak(u);
+    });
+    // A short breath between sentences.
+    await new Promise((r) => setTimeout(r, 140));
+  }
 }
 
 // ---------- Sound cues ----------

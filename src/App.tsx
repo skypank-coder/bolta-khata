@@ -9,6 +9,7 @@ import { Sabha } from './screens/Sabha';
 import { Welcome } from './components/Welcome';
 import { HelpSheet } from './components/HelpSheet';
 import { Petals } from './components/Petals';
+import { VoiceSettings } from './components/VoiceSettings';
 import type { Milestone } from './lib/coach';
 import { useBoltaKhata } from './useBoltaKhata';
 
@@ -110,6 +111,7 @@ export default function App() {
                 </div>
                 {!voiceOk && <p className="mt-2 text-sm text-haldi-light">{t.settings.voiceMissing}</p>}
               </fieldset>
+              <VoiceSettings lang={lang} />
               <form
                 className="space-y-2 rounded-lg p-3 ring-1 ring-patra/25"
                 onSubmit={(e) => {
