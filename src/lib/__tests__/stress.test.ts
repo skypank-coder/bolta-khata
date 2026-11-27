@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { appendEntries, computeBalances, verifyChain, type LedgerEntry } from '../ledger';
 import { initialState, step, type MeetingState } from '../meeting';
 import { parseAmount } from '../numbers';
+import { romanName } from '../intent';
+import { phoneticKey } from '../phonetic';
 import { buildDemoData, DEMO_GROUP } from '../store';
 
 /** Small seeded RNG so a failing run can be replayed exactly. */
@@ -90,19 +92,22 @@ function utterance(r: () => number): string {
     'मंज़ूर', 'pichli entry hatao', 'mera kitna jama hai', 'group ke paas kitna paisa hai', 'haazri poori',
     'uh hmm', 'xyz qwerty', '', '500', 'bachat', 'kist', 'Sunita 100 bachat', 'Yadav', 'phir se bolo', 'madad',
     'meeting band karo', 'sahi', 'meeting shuru karo', `galat, ${first} ${amt} bachat`, `${first} ${amt} bachat ${amt} kist`,
+    `haath mein ${amt * 10} hai`, 'naya sadasya jodo', `नया सदस्य: ${pick(['पुष्पा देवी', 'कविता', 'सुमन शर्मा'])}`,
+    `add member ${pick(['Kavita', 'Suman Sharma', first])}`,
   ]);
 }
 
-describe('stress: 300 random meetings keep the money safe', () => {
+describe('stress: 600 random meetings keep the money and members safe', () => {
   it('never breaks the chain, never lends cash it does not have, never saves without a yes', async () => {
     const base = await buildDemoData();
     const problems: string[] = [];
     const MONEY = new Set(['savings', 'repayment', 'loan']);
     const COMMIT_REPLIES = new Set(['saved', 'loanSaved', 'loanAsk', 'loanNoCash']);
 
-    for (let seed = 1; seed <= 300 && problems.length < 5; seed++) {
+    for (let seed = 1; seed <= 600 && problems.length < 5; seed++) {
       const r = rng(seed);
       let ledger: LedgerEntry[] = base.ledger;
+      const members = [...base.group.members];
       let state: MeetingState = initialState;
       const log: string[] = [];
       const steps = ['meeting shuru karo', ...Array.from({ length: 45 }, () => utterance(r))];
@@ -110,7 +115,14 @@ describe('stress: 300 random meetings keep the money safe', () => {
       for (const text of steps) {
         let res;
         try {
-          res = step(state, { text }, { members: base.group.members, ledger });
+          res = step(state, { text }, { members, ledger });
+          if (res.newMember) {
+            const key = (n: string) => romanName(n).split(/\s+/).map(phoneticKey).join(' ');
+            if (members.some((m) => key(m.name) === key(res!.newMember!.name))) {
+              problems.push(`seed ${seed}: duplicate member added on "${text}"\n${log.join('\n')}`);
+            }
+            members.push(res.newMember);
+          }
         } catch (e) {
           problems.push(`seed ${seed}: crash on "${text}": ${(e as Error).message}\n${log.join('\n')}`);
           break;
