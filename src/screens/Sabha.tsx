@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { MicButton } from '../components/MicButton';
 import { RegisterPage } from '../components/RegisterPage';
+import { SabhaCircle, type Today } from '../components/SabhaCircle';
 import { Understood } from '../components/Understood';
-import { memberBalance, meetingTotals } from '../lib/ledger';
-import { formatRupees } from '../lib/numbers';
+import { meetingTotals, reversedIds } from '../lib/ledger';
 import { EXAMPLES } from '../lib/phrases';
 import { UI } from '../lib/ui';
 import type { useBoltaKhata } from '../useBoltaKhata';
@@ -27,18 +27,34 @@ export function Sabha({ app }: { app: App }) {
     [ledger, mstate.meetingId],
   );
 
+  // Money each member brought (or took) today, for the coins on her seat.
+  const todayByMember = useMemo(() => {
+    const reversed = reversedIds(ledger);
+    const out: Record<string, Today> = {};
+    for (const e of today) {
+      if (!e.memberId || reversed.has(e.id)) continue;
+      const t = (out[e.memberId] ??= { savings: 0, repayment: 0, loan: 0 });
+      if (e.type === 'savings') t.savings += e.amount;
+      if (e.type === 'repayment') t.repayment += e.amount;
+      if (e.type === 'loan') t.loan += e.amount;
+    }
+    return out;
+  }, [today, ledger]);
+
   if (!data || !balances) return null;
 
   const name = (id: string) => {
     const m = members.find((x) => x.id === id);
     return m ? (lang === 'en' ? m.name : m.nameLocal ?? m.name) : id;
   };
-  // First name only, unless two members share it ("सुनीता कुमारी" / "सुनीता यादव").
-  const firstOf = (m: (typeof members)[number]) => (lang === 'en' ? m.name : m.nameLocal ?? m.name).split(' ')[0];
-  const shortName = (m: (typeof members)[number]) =>
-    members.filter((o) => firstOf(o) === firstOf(m)).length > 1 ? (lang === 'en' ? m.name : m.nameLocal ?? m.name) : firstOf(m);
   const p = mstate.pending;
   const busy = status === 'thinking';
+  // Whose money is on the table right now: she glows in the circle.
+  const speaker =
+    p?.kind === 'confirm' ? p.drafts[0]?.memberId
+    : p?.kind === 'approveLoan' ? p.draft.memberId
+    : p?.kind === 'needAmount' || p?.kind === 'needType' ? p.memberId
+    : mstate.lastSpeaker;
 
   // Every spoken answer also has a big button, for noisy rooms and for anyone who prefers to tap.
   const actions: Array<{ label: string; say: string; tone: 'yes' | 'no' | 'plain' }> =
@@ -54,7 +70,7 @@ export function Sabha({ app }: { app: App }) {
   const listeningText = status === 'listening' ? interim || '…' : null;
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-5 px-4 pb-48 pt-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+    <div className="mx-auto grid w-full max-w-6xl gap-5 px-4 pb-48 pt-4 lg:grid-cols-[minmax(0,1fr)_420px]">
       <section className="min-w-0">
         {/* What the app just said, and what it heard */}
         <div className="ledger-paper overflow-hidden rounded-t-xl rounded-b-md shadow-[0_10px_0_-4px_#F1DE96,0_20px_0_-8px_#E7CF7C,0_24px_40px_rgba(0,0,0,.35)]">
@@ -114,6 +130,20 @@ export function Sabha({ app }: { app: App }) {
       </section>
 
       <aside className="space-y-5">
+        <SabhaCircle
+          members={members}
+          lang={lang}
+          present={present}
+          today={todayByMember}
+          balances={balances}
+          speaker={speaker}
+          asked={p?.kind === 'pickMember' ? p.options : []}
+          cashLabel={t.cash}
+          presentLabel={t.present}
+          disabled={busy}
+          onTap={(m) => app.say(m.name, lang === 'en' ? m.name : m.nameLocal ?? m.name)}
+        />
+
         <div className="rounded-xl border-2 border-haldi/70 bg-bahi-dark/40 p-4">
           <button
             type="button"
@@ -123,44 +153,6 @@ export function Sabha({ app }: { app: App }) {
             {app.demoPlaying ? t.stopDemo : t.playDemo}
           </button>
           <p className="mt-2 text-sm text-patra/80">{t.playDemoHint}</p>
-        </div>
-
-        <div className="rounded-xl bg-bahi-dark/50 p-4 text-patra ring-1 ring-patra/15">
-          <p className="text-patra/75">{t.cash}</p>
-          <p className="font-display text-4xl num">{formatRupees(balances.groupCash)}</p>
-          {mstate.meetingId && (
-            <p className="mt-1 text-patra/80 num">{present.size}/{members.length} {t.present}</p>
-          )}
-        </div>
-
-        <div>
-          <h2 className="mb-2 font-display text-lg text-patra">{t.members}</h2>
-          <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-3">
-            {members.map((m) => {
-              const b = memberBalance(balances, m.id);
-              const here = present.has(m.id);
-              const asked = p?.kind === 'pickMember' && p.options.includes(m.id);
-              return (
-                <li key={m.id}>
-                  <button
-                    type="button"
-                    onClick={() => app.say(m.name, lang === 'en' ? m.name : m.nameLocal ?? m.name)}
-                    disabled={busy}
-                    title={`${t.savings} ${formatRupees(b.savings)}, ${t.loanLeft} ${formatRupees(b.loanOutstanding)}`}
-                    className={`flex w-full flex-col items-start rounded-lg px-2.5 py-2 text-left transition ${
-                      here ? 'bg-patra text-neel' : 'bg-bahi-dark/40 text-patra/85 ring-1 ring-patra/15'
-                    } ${asked ? 'ring-4 ring-haldi' : ''}`}
-                  >
-                    <span className="flex w-full items-center justify-between gap-1">
-                      <span className="truncate font-semibold leading-tight">{shortName(m)}</span>
-                      {here && <span aria-label={t.present} className="text-mohar">●</span>}
-                    </span>
-                    <span className={`text-xs num ${here ? 'text-neel-soft' : 'text-patra/60'}`}>{formatRupees(b.savings)}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
         </div>
 
         <div>
