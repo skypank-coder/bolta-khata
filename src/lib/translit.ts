@@ -94,8 +94,14 @@ export function transliterate(input: string): string {
     out += ch.toLowerCase();
   }
 
-  // Schwa deletion: inherent vowel is silent at the end of a word ("कमल" -> kamal).
+  // Schwa deletion, as Hindi is spoken:
+  //  - silent at the end of a word ("कमल" -> kamal)
+  //  - silent between vowel+consonant and consonant+vowel ("कितना" -> kitnaa, "पिछली" -> pichhlee)
   out = out.replace(new RegExp(SCHWA + '(?=$|[^a-z\u0001])', 'g'), '');
+  out = out.replace(
+    new RegExp(`([aeiou${SCHWA}])([bcdfghjklmnpqrstvwxyz]+)${SCHWA}(?=[bcdfghjklmnpqrstvwxyz]+[aeiou])`, 'g'),
+    '$1$2',
+  );
   return out.replace(new RegExp(SCHWA, 'g'), 'a');
 }
 

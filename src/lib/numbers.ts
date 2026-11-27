@@ -101,6 +101,8 @@ const FRACTION_PREFIXES = new Map(Object.entries(FRACTION_PREFIX).map(([k, v]) =
 
 /** Words that look like numbers but usually are not, unless "rupaye" follows. */
 const RISKY_ALONE = new Set(['saath', 'so', 'saw', 'k'].map(fold));
+/** Compared before folding: हजर transliterates to "hajar", हजार to "hajaar". */
+const PRESENT_NOT_THOUSAND = new Set(['hajar', 'hajir', 'hazir']);
 
 export interface NumberSpan {
   value: number;
@@ -216,7 +218,8 @@ export function findAmounts(tokens: string[]): NumberSpan[] {
     }
     const value = Math.round(total + current);
     const followedByCurrency = end + 1 < tokens.length && classify(tokens[end + 1])[0].kind === 'cur';
-    const singleRisky = end === i && RISKY_ALONE.has(fold(tokens[i]));
+    // A lone "hajar" is Marathi हजर (present), not हजार (thousand). A lone "sau" still means 100.
+    const singleRisky = end === i && (RISKY_ALONE.has(fold(tokens[i])) || PRESENT_NOT_THOUSAND.has(tokens[i]));
     // A lone small word ("do", "ek") or a lone fraction ("did", "aadha") is too risky
     // to read as money unless "rupaye" follows it.
     const weakAlone = !sawDigit && !sawMultiplier && (value < 10 || sawFraction);

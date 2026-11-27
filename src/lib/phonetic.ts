@@ -76,6 +76,16 @@ const STOP_WORDS = new Set(
 );
 
 const MATCH_THRESHOLD = 0.72;
+/** Extra score for each further part of a name that was also said ("Sunita Yadav" beats "Sunita"). */
+const EXTRA_PART_BONUS = 0.15;
+/** Case endings glued onto names: Marathi "Radhala", "Meenachi"; Hindi "Meenaji". */
+const SUFFIXES = ['la', 'ne', 'chi', 'cha', 'che', 'ji', 'ko', 'ki', 'ka', 'kade', 'sathi'];
+
+function variants(tok: string): string[] {
+  const out = [tok];
+  for (const s of SUFFIXES) if (tok.length > s.length + 2 && tok.endsWith(s)) out.push(tok.slice(0, -s.length));
+  return out;
+}
 const AMBIGUITY_GAP = 0.12;
 
 function namePartsOf(m: NamedMember): string[] {
@@ -94,18 +104,26 @@ export function matchMember(tokens: string[], members: NamedMember[]): MatchResu
   for (const m of members) {
     let best: NameMatch | null = null;
     const parts = namePartsOf(m);
+    const partHits = new Set<string>();
     for (let i = 0; i < tokens.length; i++) {
       const tok = tokens[i];
       if (tok.length < 2 || /^\d/.test(tok) || STOP_WORDS.has(fold(tok))) continue;
-      for (const part of parts) {
-        const score = nameSimilarity(tok, part);
-        const exact = fold(tok) === fold(part);
-        if (score >= MATCH_THRESHOLD && (!best || score > best.score || (score === best.score && exact))) {
-          best = { memberId: m.id, score, exact, start: i, end: i };
+      for (const v of variants(fold(tok))) {
+        for (const part of parts) {
+          const score = nameSimilarity(v, part);
+          if (score < MATCH_THRESHOLD) continue;
+          partHits.add(part);
+          const exact = fold(v) === fold(part);
+          if (!best || score > best.score || (score === best.score && exact)) {
+            best = { memberId: m.id, score, exact, start: i, end: i };
+          }
         }
       }
     }
-    if (best) candidates.push(best);
+    if (best) {
+      best.score += EXTRA_PART_BONUS * (partHits.size - 1);
+      candidates.push(best);
+    }
   }
 
   candidates.sort((a, b) => b.score - a.score || Number(b.exact) - Number(a.exact));
