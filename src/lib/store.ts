@@ -30,6 +30,8 @@ export interface AppData {
   group: Group;
   ledger: LedgerEntry[];
   settings: Settings;
+  /** Set only during the tamper demo, so the original entry can be put back. */
+  tamperBackup?: { index: number; entry: LedgerEntry };
 }
 
 const DB_NAME = 'bolta-khata';
