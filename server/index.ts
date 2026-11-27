@@ -4,7 +4,8 @@ import { createHandler } from './app.ts';
 import { openDb } from './db.ts';
 
 /** One process serves the app and the API. Nothing to configure: every setting has a default. */
-const PORT = Number(process.env.PORT ?? 3000);
+const argPort = process.argv.indexOf('--port');
+const PORT = Number(process.env.PORT ?? (argPort > 0 ? process.argv[argPort + 1] : 3000));
 const DATA_DIR = process.env.DATA_DIR ?? 'data';
 const DIST_DIR = process.env.DIST_DIR ?? 'dist';
 

@@ -6,7 +6,7 @@
   "description": "Voice-first ledger that runs a Self-Help Group meeting entirely by speaking.",
   "scripts": {
     "dev": "vite",
-    "dev:api": "node --watch server/index.ts",
+    "dev:api": "node --watch server/index.ts --port 8787",
     "build": "tsc -b && tsc -p tsconfig.server.json && vite build",
     "start": "node server/index.ts",
     "preview": "vite preview --port 3000",

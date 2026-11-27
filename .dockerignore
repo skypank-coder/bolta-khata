@@ -4,3 +4,5 @@ dev-dist
 .git
 *.log
 *.tsbuildinfo
+server/__tests__
+data

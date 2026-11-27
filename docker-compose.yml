@@ -4,4 +4,9 @@ services:
     image: bolta-khata:latest
     ports:
       - "3000:3000"
+    volumes:
+      - bolta-data:/data   # accounts, groups and every ledger survive restarts
     restart: unless-stopped
+
+volumes:
+  bolta-data:
