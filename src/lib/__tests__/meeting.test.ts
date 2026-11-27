@@ -253,3 +253,15 @@ describe('counting the cash box by voice', () => {
     expect(parseIntent('Meena 500 bachat', DEMO_GROUP_MEMBERS).kind).toBe('entry');
   });
 });
+
+describe('understood-as highlighting', () => {
+  it('marks the name, amounts and types in the speaker\'s own words', async () => {
+    const { annotate } = await import('../intent');
+    const marks = (t: string) => annotate(t, DEMO_GROUP_MEMBERS).filter((p) => p.word.trim()).map((p) => `${p.word}:${p.mark}`);
+    expect(marks('मैं मीना, सौ रुपये बचत, पाँच सौ किस्त')).toEqual([
+      'मैं:null', 'मीना,:name', 'सौ:amount', 'रुपये:null', 'बचत,:savings', 'पाँच:amount', 'सौ:amount', 'किस्त:repayment',
+    ]);
+    expect(marks('Radha ko dedh hazaar loan')).toEqual(['Radha:name', 'ko:null', 'dedh:amount', 'hazaar:amount', 'loan:loan']);
+    expect(marks('हाँ सही है')).toEqual(['हाँ:yes', 'सही:yes', 'है:null']);
+  });
+});

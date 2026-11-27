@@ -185,3 +185,33 @@ export function parseIntent(text: string, members: NamedMember[]): Intent {
   if (set.has('sahi') || set.has('haan')) return { kind: 'confirm' };
   return { kind: 'unknown' };
 }
+
+export type Mark = 'name' | 'amount' | MoneyType | 'yes' | 'no' | 'cash' | null;
+
+/**
+ * Which words of a sentence were understood as what, so the screen can colour
+ * the speaker's own words: the name, the amount, bachat/kist/loan, sahi/galat.
+ */
+export function annotate(text: string, members: NamedMember[]): Array<{ word: string; mark: Mark }> {
+  const words = text.split(/(\s+)/);
+  const flat: string[] = [];
+  const owner: number[] = [];
+  words.forEach((w, wi) => {
+    if (!w.trim()) return;
+    for (const t of tokenize(w)) { flat.push(t); owner.push(wi); }
+  });
+  const marks = new Map<number, Mark>();
+  for (const s of findAmounts(flat)) for (let i = s.start; i <= s.end; i++) marks.set(owner[i], 'amount');
+  flat.forEach((t, i) => {
+    if (marks.has(owner[i])) return;
+    const f = fold(t);
+    const type = classifyKeyword(f);
+    if (type) marks.set(owner[i], type);
+    else if (APPROVE.has(f) || (CONFIRM.has(f) && f.length > 2)) marks.set(owner[i], 'yes');
+    else if (REJECT.has(f) && f.length > 2) marks.set(owner[i], 'no');
+    else if (CASH.has(f)) marks.set(owner[i], 'cash');
+  });
+  const m = matchMember(flat.map((t, i) => (marks.has(owner[i]) ? '' : t)), members);
+  for (const c of [m.best, ...(m.ambiguous ?? [])]) if (c) marks.set(owner[c.start], 'name');
+  return words.map((word, wi) => ({ word, mark: marks.get(wi) ?? null }));
+}

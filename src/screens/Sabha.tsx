@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { MicButton } from '../components/MicButton';
 import { RegisterPage } from '../components/RegisterPage';
+import { Understood } from '../components/Understood';
 import { memberBalance, meetingTotals } from '../lib/ledger';
 import { formatRupees } from '../lib/numbers';
 import { EXAMPLES } from '../lib/phrases';
@@ -66,12 +67,14 @@ export function Sabha({ app }: { app: App }) {
 
           <div className="min-h-[176px] py-4 pl-16 pr-5" aria-live="polite">
             {listeningText !== null ? (
-              <p className="font-display text-[1.7rem] leading-[44px] text-neel-soft">{listeningText}</p>
+              <p className="font-display text-[1.7rem] leading-[44px] text-neel-soft">
+                <Understood text={listeningText} members={members} />
+              </p>
             ) : lastExchange ? (
               <>
                 {lastExchange.heard && (
                   <p className="text-base leading-[44px] text-neel-soft">
-                    <span className="mr-2 text-bahi/80">{t.heard}:</span>“{lastExchange.heard}”
+                    <span className="mr-2 text-bahi/80">{t.heard}:</span>“<Understood text={lastExchange.heard} members={members} />”
                   </p>
                 )}
                 <p className="font-display text-[1.7rem] leading-[44px] text-neel">{lastExchange.rendered.show}</p>
