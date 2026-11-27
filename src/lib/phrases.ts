@@ -247,3 +247,27 @@ export const EXAMPLES: Record<Lang, Record<'idle' | 'attendance' | 'entries' | '
     closed: ['Start the meeting'],
   },
 };
+
+/**
+ * A whole meeting the app can play by itself: attendance, two Sunitas, a read-back,
+ * an overpaid loan, a loan approval, a balance question, closing and a short cash box.
+ * Run through the real engine in tests, so it can never silently break.
+ */
+export const DEMO_SCRIPT: Record<Lang, string[]> = {
+  hi: [
+    'मीटिंग शुरू करो', 'मैं मीना हूँ', 'राधा हाज़िर', 'रेखा हाज़िर', 'सुनीता', 'यादव', 'हाज़िरी पूरी',
+    'मैं मीना, दो सौ रुपये बचत', 'हाँ सही है', 'रेखा की किस्त दो हज़ार', 'सही है',
+    'राधा को ढाई हज़ार लोन', 'मंज़ूर', 'मेरा कितना जमा है?', 'मीटिंग बंद करो', 'हाथ में बीस हज़ार एक सौ है', 'सही है',
+  ],
+  mr: [
+    'मीटिंग सुरू करा', 'मी मीना', 'राधा हजर', 'रेखा हजर', 'सुनीता', 'यादव', 'हजेरी पूर्ण',
+    'मी मीना, दोनशे रुपये बचत', 'बरोबर', 'रेखा हप्ता दोन हजार', 'हो',
+    'राधाला अडीच हजार कर्ज', 'मंजूर', 'माझी किती बचत आहे?', 'मीटिंग बंद करा', 'रोख वीस हजार शंभर', 'बरोबर',
+  ],
+  en: [
+    'Start the meeting', 'I am Meena', 'Radha present', 'Rekha present', 'Sunita', 'Yadav', 'Attendance done',
+    'Meena, two hundred rupees savings', 'yes', 'Rekha repayment two thousand', 'right',
+    'Radha loan two thousand five hundred', 'approve', 'How much have I saved?', 'End the meeting',
+    'Cash in hand twenty thousand one hundred', 'yes',
+  ],
+};

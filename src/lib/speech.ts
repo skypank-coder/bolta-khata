@@ -144,7 +144,7 @@ export function stopSpeaking(): void {
 }
 
 /** Speak and resolve when finished (or after a safety timeout, since some browsers never fire 'end'). */
-export async function speak(text: string, lang: string, rate = 0.92): Promise<void> {
+export async function speak(text: string, lang: string, rate = 0.92, pitch = 1): Promise<void> {
   if (!ttsSupported() || !text) return;
   speechSynthesis.cancel();
   const voice = await pickVoice(lang);
@@ -153,6 +153,7 @@ export async function speak(text: string, lang: string, rate = 0.92): Promise<vo
     u.lang = voice?.lang ?? lang;
     if (voice) u.voice = voice;
     u.rate = rate;
+    u.pitch = pitch;
     const timeout = setTimeout(resolve, 2500 + text.length * 110);
     u.onend = () => { clearTimeout(timeout); resolve(); };
     u.onerror = () => { clearTimeout(timeout); resolve(); };

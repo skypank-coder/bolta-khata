@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { appendEntries, computeBalances, verifyChain, type ChainReport, type LedgerEntry } from './lib/ledger';
 import { initialState, resumeState, step, type MeetingState, type Reply } from './lib/meeting';
-import { render, SPEECH_LANG, type Rendered } from './lib/phrases';
+import { DEMO_SCRIPT, render, SPEECH_LANG, type Rendered } from './lib/phrases';
 import {
   cueError, cueListen, cueSaved, listen, micLevel, speak, stopSpeaking, sttSupported,
   type Heard, type ListenError, type ListenHandle,
@@ -38,6 +38,8 @@ export function useBoltaKhata() {
   const loopRef = useRef(false);
   const listenRef = useRef<ListenHandle | null>(null);
   const exchangeId = useRef(0);
+  const demoRef = useRef(false);
+  const [demoPlaying, setDemoPlaying] = useState(false);
 
   const commitData = useCallback((next: AppData) => {
     dataRef.current = next;
@@ -122,6 +124,8 @@ export function useBoltaKhata() {
 
   const stopLoop = useCallback(() => {
     loopRef.current = false;
+    demoRef.current = false;
+    setDemoPlaying(false);
     listenRef.current?.abort();
     listenRef.current = null;
     stopSpeaking();
@@ -168,7 +172,7 @@ export function useBoltaKhata() {
   }, [process]);
 
   const toggleTalk = useCallback(() => {
-    if (loopRef.current || status !== 'idle') { stopLoop(); return; }
+    if (loopRef.current || demoRef.current || status !== 'idle') { stopLoop(); return; }
     if (!sttSupported()) { setError('unsupported'); return; }
     setError(null);
     loopRef.current = true;
@@ -213,11 +217,47 @@ export function useBoltaKhata() {
     commitData({ ...d, ledger, tamperBackup: undefined });
   }, [commitData]);
 
+  /**
+   * Play a whole meeting by itself on a fresh demo group: each member line is typed out
+   * and spoken in a higher voice, then answered by the app, exactly as in a live meeting.
+   */
+  const playDemo = useCallback(async () => {
+    stopLoop();
+    const lang = dataRef.current?.settings.lang ?? 'hi';
+    const fresh = await buildDemoData(lang);
+    fresh.settings = { ...fresh.settings, ...dataRef.current?.settings };
+    stateRef.current = initialState;
+    setMstate(initialState);
+    setExchanges([]);
+    commitData(fresh);
+    demoRef.current = true;
+    setDemoPlaying(true);
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    for (const line of DEMO_SCRIPT[lang]) {
+      if (!demoRef.current) break;
+      setStatus('listening');
+      for (let i = 1; i <= line.length && demoRef.current; i += 2) {
+        setInterim(line.slice(0, i));
+        await wait(28);
+      }
+      setInterim(line);
+      await speak(line, SPEECH_LANG[lang], 1.02, 1.35);
+      if (!demoRef.current) break;
+      setInterim('');
+      await process({ text: line });
+      await wait(450);
+    }
+    demoRef.current = false;
+    setDemoPlaying(false);
+    setInterim('');
+    setStatus('idle');
+  }, [commitData, process, stopLoop]);
+
   const balances = useMemo(() => (data ? computeBalances(data.ledger) : null), [data]);
 
   return {
     data, lang, mstate, status, interim, exchanges, error, level, chain, balances, stampKey,
-    toggleTalk, say, updateSettings, resetDemo, tamper, undoTamper, stopLoop,
+    toggleTalk, say, updateSettings, resetDemo, tamper, undoTamper, stopLoop, playDemo, demoPlaying,
     lastExchange: exchanges[exchanges.length - 1] ?? null,
   };
 }

@@ -114,6 +114,17 @@ export function Sabha({ app }: { app: App }) {
       </section>
 
       <aside className="space-y-5">
+        <div className="rounded-xl border-2 border-haldi/70 bg-bahi-dark/40 p-4">
+          <button
+            type="button"
+            onClick={() => (app.demoPlaying ? app.stopLoop() : void app.playDemo())}
+            className="w-full rounded-lg bg-haldi px-4 py-3 font-display text-xl text-bahi-dark shadow-[0_4px_0_#8a6200] active:translate-y-0.5"
+          >
+            {app.demoPlaying ? t.stopDemo : t.playDemo}
+          </button>
+          <p className="mt-2 text-sm text-patra/80">{t.playDemoHint}</p>
+        </div>
+
         <div className="rounded-xl bg-bahi-dark/50 p-4 text-patra ring-1 ring-patra/15">
           <p className="text-patra/75">{t.cash}</p>
           <p className="font-display text-4xl num">{formatRupees(balances.groupCash)}</p>

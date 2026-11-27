@@ -265,3 +265,23 @@ describe('understood-as highlighting', () => {
     expect(marks('हाँ सही है')).toEqual(['हाँ:yes', 'सही:yes', 'है:null']);
   });
 });
+
+describe('the self-playing demo meeting', async () => {
+  const { DEMO_SCRIPT } = await import('../phrases');
+  for (const lang of ['hi', 'mr', 'en'] as const) {
+    it(`${lang}: every line is understood and the meeting closes with a short cash box`, async () => {
+      const m = await meeting();
+      for (const line of DEMO_SCRIPT[lang]) await m.say(line);
+      const keys = m.replies.map((r) => r.key);
+      expect(keys).not.toContain('notUnderstood');
+      expect(keys).not.toContain('needMember');
+      expect(keys).toEqual([
+        'started', 'present', 'present', 'present', 'pick', 'present', 'attendanceDone',
+        'readback', 'saved', 'readback', 'saved', 'loanAsk', 'loanSaved', 'selfBalance', 'summary', 'cashCount', 'closed',
+      ]);
+      expect(m.replies[9]).toMatchObject({ warn: 'overpay' });
+      expect(m.replies[15]).toMatchObject({ counted: 20100, expected: 20200 });
+      expect((await verifyChain(m.ledger)).ok).toBe(true);
+    });
+  }
+});
