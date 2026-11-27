@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+html, body, #root { height: 100%; }
+body {
+  @apply bg-mitti-50 text-mitti-900 font-body antialiased;
+  background-image: radial-gradient(circle at 1px 1px, rgba(124, 45, 18, 0.06) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+h1, h2, h3 { @apply font-display; }
+button { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid #e8a317; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
