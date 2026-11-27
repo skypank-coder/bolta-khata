@@ -9,182 +9,354 @@
   :root { --bahi:#9E1B1F; --bahi-dark:#6E1013; --patra:#FAEFC4; --patra-deep:#F1DE96; --neel:#1D2766; --neel-soft:#3B4690; --mohar:#1C7A48; --haldi:#E0A100; }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Hind', sans-serif; color: var(--neel); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .slide { width: 1280px; height: 720px; position: relative; overflow: hidden; page-break-after: always; padding: 64px 80px 56px 128px;
+  .slide { width: 1280px; height: 720px; position: relative; overflow: hidden; page-break-after: always; padding: 56px 80px 48px 128px;
     background-color: var(--patra);
-    background-image:
-      linear-gradient(90deg, transparent 96px, rgba(158,27,31,.45) 96px, rgba(158,27,31,.45) 98px, transparent 98px);
-  }
+    background-image: linear-gradient(90deg, transparent 96px, rgba(158,27,31,.45) 96px, rgba(158,27,31,.45) 98px, transparent 98px); }
   .slide.cover { background: var(--bahi); color: var(--patra); padding: 80px 96px;
     background-image: repeating-linear-gradient(45deg, rgba(0,0,0,.05) 0 2px, transparent 2px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,.035) 0 2px, transparent 2px 6px); }
-  .num { position: absolute; left: 0; top: 64px; width: 88px; text-align: right; font-size: 18px; color: rgba(158,27,31,.7); }
+  .num { position: absolute; left: 0; top: 60px; width: 88px; text-align: right; font-size: 18px; color: rgba(158,27,31,.75); }
+  .section { font-size: 18px; font-weight: 600; color: var(--neel-soft); margin: 0 0 6px; }
   h1, h2 { font-family: 'Yatra One', sans-serif; font-weight: 400; margin: 0; }
   h1 { font-size: 88px; line-height: 1; }
-  h2 { font-size: 46px; line-height: 1.1; color: var(--bahi); margin-bottom: 28px; max-width: 980px; }
-  p, li { font-size: 25px; line-height: 1.5; margin: 0; }
-  ul, ol { margin: 0; padding-left: 28px; }
-  li + li { margin-top: 10px; }
-  .dense li { font-size: 22px; line-height: 1.42; }
-  .dense li + li { margin-top: 7px; }
-  .lead { font-size: 30px; line-height: 1.45; max-width: 960px; }
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
-  .big { font-family: 'Yatra One', sans-serif; font-size: 64px; line-height: 1; color: var(--bahi); }
-  .stat p { font-size: 22px; color: var(--neel-soft); }
-  .stat p.big { font-size: 64px; color: var(--bahi); margin-bottom: 8px; }
-  table { border-collapse: collapse; width: 100%; font-size: 21px; }
-  th { text-align: left; color: var(--neel-soft); font-weight: 600; padding: 8px 14px 8px 0; border-bottom: 2px solid rgba(29,39,102,.3); }
-  td { padding: 10px 14px 10px 0; border-bottom: 1px solid rgba(29,39,102,.12); vertical-align: top; line-height: 1.4; }
-  .stamp { display: inline-block; border: 4px solid var(--mohar); color: var(--mohar); font-family: 'Yatra One'; font-size: 34px; padding: 0 14px; transform: rotate(-8deg); border-radius: 8px; }
-  .talk { font-family: 'Yatra One'; font-size: 30px; line-height: 1.5; }
+  h2 { font-size: 40px; line-height: 1.12; color: var(--bahi); margin-bottom: 22px; max-width: 1040px; }
+  p, li { font-size: 22px; line-height: 1.45; margin: 0; }
+  ul, ol { margin: 0; padding-left: 26px; }
+  li + li { margin-top: 8px; }
+  .small li, .small p { font-size: 19.5px; line-height: 1.4; }
+  .small li + li { margin-top: 5px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; }
+  .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+  .big { font-family: 'Yatra One', sans-serif; font-size: 54px; line-height: 1; color: var(--bahi); }
+  .card { background: rgba(241,222,150,.55); border-radius: 14px; padding: 18px 20px; }
+  .card h3 { font-family: 'Yatra One'; font-weight: 400; font-size: 26px; color: var(--bahi); margin: 0 0 6px; }
+  .card p { font-size: 19px; line-height: 1.4; }
+  table { border-collapse: collapse; width: 100%; font-size: 18.5px; }
+  th { text-align: left; color: var(--neel-soft); font-weight: 700; padding: 6px 12px 6px 0; border-bottom: 2px solid rgba(29,39,102,.3); }
+  td { padding: 7px 12px 7px 0; border-bottom: 1px solid rgba(29,39,102,.12); vertical-align: top; line-height: 1.35; }
+  td b { color: var(--bahi); }
+  .stamp { display: inline-block; border: 4px solid var(--mohar); color: var(--mohar); font-family: 'Yatra One'; font-size: 30px; padding: 0 14px; transform: rotate(-8deg); border-radius: 8px; }
+  .talk p { font-family: 'Yatra One'; font-size: 24px; line-height: 1.45; }
   .talk .q { color: var(--neel-soft); }
-  .talk .a { color: var(--neel); }
-  .cover .sub { font-size: 34px; line-height: 1.4; max-width: 900px; margin-top: 28px; }
-  .cover .meta { position: absolute; bottom: 64px; left: 96px; font-size: 22px; opacity: .85; line-height: 1.6; }
-  .foot { position: absolute; bottom: 28px; right: 80px; font-size: 16px; color: var(--neel-soft); }
+  .note { font-size: 16px; color: var(--neel-soft); margin-top: 12px; }
+  table.tight { font-size: 16.5px; }
+  table.tight td { padding: 5px 12px 5px 0; line-height: 1.3; }
+  .cover .sub { font-size: 32px; line-height: 1.4; max-width: 920px; margin-top: 24px; }
+  .cover .meta { position: absolute; bottom: 60px; left: 96px; font-size: 21px; opacity: .9; line-height: 1.6; }
+  .cover .contents { position: absolute; bottom: 60px; right: 96px; font-size: 19px; line-height: 1.6; text-align: right; opacity: .9; }
 </style>
 </head>
 <body>
 
+<!-- 0 -->
 <section class="slide cover">
   <h1>बोलता खाता</h1>
   <p style="font-family:'Yatra One';font-size:44px;margin-top:10px">Bolta Khata</p>
-  <p class="sub">The weekly Self-Help Group meeting, run by voice. Every entry is heard by the whole group before it is saved, and nobody can quietly change it later.</p>
-  <p class="meta">India Runs on Voice hackathon, Round 2<br>Theme: Livelihoods and small business<br>Working prototype: github.com/skypank-coder/bolta-khata</p>
+  <p class="sub">The weekly Self-Help Group meeting, run by voice. Every member speaks her own entry, the phone reads it back to the whole group, and it is written only after the group says "sahi hai". After that, nobody can quietly change it.</p>
+  <p class="meta">India Runs on Voice, Round 2<br>Theme: Livelihoods and small business<br>Code: github.com/skypank-coder/bolta-khata<br>Runs with one command: docker compose up</p>
+  <p class="contents">1–5 Problem and solution<br>6–8 Product and proof<br>9–10 Addressable market<br>11–12 Third-party dependencies and risks<br>13–15 Go-to-market plan</p>
 </section>
 
+<!-- 1 -->
 <section class="slide">
   <span class="num">1</span>
-  <h2>Problem: one woman writes the register, everyone else has to trust her</h2>
+  <p class="section">Problem</p>
+  <h2>One woman writes the register. Everyone else has to trust her.</h2>
   <div class="cols">
     <div>
-      <p>Over 9 crore rural women save and borrow through Self-Help Groups. Every week, 10 to 15 members sit together and hand over money. One member, the bookkeeper, writes it into a paper register. Often she is the only one who can read it.</p>
+      <p>Over 9 crore rural women in India save and borrow through about 90 lakh Self-Help Groups (SHGs) under DAY-NRLM. Every week, 10 to 15 members sit together and hand over money. One member, the bookkeeper, writes it into a paper register, and often she is the only one who can read it.</p>
+      <p style="margin-top:14px">The meeting already happens out loud. The record does not.</p>
     </div>
     <ul>
-      <li>Members cannot check what was written against their own name.</li>
-      <li>Errors and misuse surface months later as fights or missing money.</li>
-      <li>If the bookkeeper is absent or leaves, the records stop.</li>
-      <li>Banks want clean books before lending, so a messy register costs the whole group credit.</li>
-      <li>Apps like LokOS still depend on the one member who can read and type.</li>
+      <li><b>No one can check:</b> members cannot read what was written against their own name.</li>
+      <li><b>Errors surface late:</b> mistakes and misuse appear months later, as fights or missing money.</li>
+      <li><b>Records stop:</b> when the bookkeeper is absent or leaves, the register stops.</li>
+      <li><b>Cash does not match:</b> the money in the box rarely matches the register, and audits catch it late.</li>
+      <li><b>Credit suffers:</b> banks want clean books before lending, so a messy register costs the whole group.</li>
+      <li><b>Apps did not fix it:</b> tools such as LokOS are typed by the same bookkeeper, so one woman stays in control.</li>
     </ul>
   </div>
 </section>
 
+<!-- 2 -->
 <section class="slide">
   <span class="num">2</span>
-  <h2>Solution: the meeting already happens out loud, so the record should too</h2>
-  <div class="cols">
+  <p class="section">Who has the problem</p>
+  <h2>Five people at every meeting, each with a different pain</h2>
+  <div class="cols3" style="grid-template-columns: repeat(3, 1fr)">
+    <div class="card"><h3>Member</h3><p>Pays every week but cannot read the register. Learns her balance only when the bookkeeper tells her. Wants to hear it herself.</p></div>
+    <div class="card"><h3>Bookkeeper</h3><p>Writes everything, twice: paper and then an app. Is blamed for every mismatch. Wants the work to be shared and checked.</p></div>
+    <div class="card"><h3>Leader</h3><p>Approves loans and must keep the cash honest. Wants clear totals, who paid, who did not, and what is in the box.</p></div>
+    <div class="card"><h3>NGO worker / CRP</h3><p>Supports dozens of groups and visits each one rarely. Wants to see every group's health without travelling.</p></div>
+    <div class="card"><h3>Bank and federation</h3><p>Decides on credit for the group. Wants records nobody could have edited, and a clean meeting history.</p></div>
+    <div class="card" style="background:rgba(28,122,72,.12)"><h3 style="color:#1C7A48">One answer</h3><p>A record made out loud, heard by all, confirmed by all, and locked. Bolta Khata serves all five from one phone at the meeting.</p></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <span class="num">3</span>
+  <p class="section">Solution</p>
+  <h2>The meeting runs by voice, and the group confirms every entry</h2>
+  <div class="cols small">
     <ol>
-      <li>The leader says "meeting shuru karo". Members say their names for attendance.</li>
-      <li>Each woman speaks her own entry: "Main Meena, sau rupaye bachat, paanch sau kist".</li>
-      <li>The phone reads it back to everyone with her new balance and asks "sahi hai?".</li>
-      <li>Only after "sahi hai" is it written. Loans need the leader's "manzoor" and enough group cash.</li>
-      <li>"Meeting band karo" reads the day's totals and who paid nothing, then makes a bank report and a receipt for every member.</li>
+      <li>The leader says "meeting shuru karo". Members say their names; each one's seat fills in the on-screen circle.</li>
+      <li>Each woman speaks her entry: "main Meena, sau rupaye bachat, paanch sau kist".</li>
+      <li>The phone reads it back to everyone with her new loan balance, and asks "sahi hai?".</li>
+      <li>Only after "sahi hai" is it written and hash-locked. Loans need the leader's "manzoor" and enough group cash.</li>
+      <li>"Meeting band karo" reads the totals and who paid nothing; the leader counts the cash by voice ("haath mein 20,100 hai") and the app says if anything is short.</li>
+      <li>The bank report and a receipt for every member are produced automatically.</li>
     </ol>
-    <div class="talk" style="padding-top:6px">
+    <div class="talk">
       <p class="q">"मैं मीना, सौ रुपये बचत, पाँच सौ किस्त"</p>
-      <p class="a" style="margin-top:18px">मीना देवी: बचत ₹100, किस्त ₹500। बाकी लोन ₹1,500। सही है?</p>
-      <p class="q" style="margin-top:18px">"हाँ, सही है"</p>
-      <p style="margin-top:18px"><span class="stamp">सही</span></p>
+      <p style="margin-top:14px">मीना देवी: बचत ₹100, किस्त ₹500। बाकी लोन ₹1,500। सही है?</p>
+      <p class="q" style="margin-top:14px">"हाँ, सही है"</p>
+      <p style="margin-top:14px"><span class="stamp">सही</span></p>
+      <p style="margin-top:18px;font-family:Hind;font-size:19px;color:#3B4690">The same in Marathi ("मी मीना, शंभर रुपये बचत") and English. Hindi is the default.</p>
     </div>
   </div>
 </section>
 
+<!-- 4 -->
 <section class="slide">
-  <span class="num">3</span>
-  <h2>Why voice comes first, not as a feature on top</h2>
-  <ul class="lead">
+  <span class="num">4</span>
+  <p class="section">Why voice</p>
+  <h2>Voice is the product, not a feature on top</h2>
+  <ul>
     <li>Most members cannot read a register or a screen, but every woman can speak and listen.</li>
-    <li>Reading each entry aloud turns a private notebook into a record the whole group checks together, in its own language.</li>
-    <li>A typing app would leave the same one woman in control. Voice gives every member her own way to check the accounts, and to ask "mera kitna jama hai?" at any time.</li>
-    <li>Hands-free: tap once and it listens, answers and listens again for the whole meeting. Every spoken question also has a big button for noisy rooms.</li>
-    <li>Nobody needs training: Sakhi Didi, an animated guide, shows every screen aloud; a coach under every reply says the exact words to say next.</li>
+    <li>Reading each entry aloud turns a private notebook into a record the whole group checks together, in its own language. A typing app leaves the same one woman in control.</li>
+    <li>Any member can ask "mera kitna jama hai?" at any meeting and hear her own balance.</li>
+    <li>Hands-free: tap once and it listens, answers and listens again for the whole meeting. Every spoken question also has a big button, for noisy rooms.</li>
+    <li>Nobody needs training: a coach under every reply shows the exact words to say next, help cards read themselves aloud, and Sakhi Didi, an animated guide, explains every screen by voice.</li>
+    <li>The speaker's own words light up as they are understood (name, amount, savings or repayment), so the group sees the phone understood before it answers.</li>
   </ul>
 </section>
 
-<section class="slide dense">
-  <span class="num">4</span>
-  <h2>What is built and working today</h2>
-  <div class="cols">
-    <ul>
-      <li>Hindi, Marathi and English, in Devanagari or Roman, mixed in one sentence.</li>
-      <li>Money as villages say it: dedh hazaar, dhai sau, saade teen hazaar, paune do hazaar, pachchis, paachshe.</li>
-      <li>Indian name matching: Sunita, Suneeta, Sunitha and सुनीता reach the same member. Two Sunitas? It asks which.</li>
-      <li>Members sit in a circle on screen, as on the durrie; a real group is set up by voice: "naya sadasya jodo: Pushpa Devi".</li>
-      <li>Guards: an overpaid loan is closed and the rest saved, large amounts confirmed twice, loans checked against group cash.</li>
-    </ul>
-    <ul>
-      <li>Tamper-evident ledger: each entry is locked to the previous one with SHA-256. A quiet edit turns the ledger red at that entry.</li>
-      <li>Mistakes are cancelled by reversal entries, never deleted.</li>
-      <li>Bank report (PDF), CSV, receipts read aloud or sent on WhatsApp.</li>
-      <li>Works offline as an installable app; saved online when there is signal.</li>
-      <li>Cash box counted by voice; any shortfall is announced and locked in.</li>
-      <li>Live product: website, mobile + PIN accounts, groups dashboard, offline-first cloud sync; 158 tests.</li>
-    </ul>
-  </div>
-</section>
-
+<!-- 5 -->
 <section class="slide">
   <span class="num">5</span>
-  <h2>Who it is for, and how many</h2>
-  <div class="cols" style="grid-template-columns: 1fr 1fr 1fr; gap: 36px; margin-bottom: 40px">
-    <div class="stat"><p class="big">9 crore+</p><p>rural women in Self-Help Groups</p></div>
-    <div class="stat"><p class="big">~90 lakh</p><p>groups, each meeting about 52 times a year</p></div>
-    <div class="stat"><p class="big">1 phone</p><p>per group is enough, shared in the meeting</p></div>
+  <p class="section">Built for Indian speech</p>
+  <h2>It understands money and names the way villages say them</h2>
+  <div class="cols small">
+    <ul>
+      <li><b>Fractions:</b> dedh hazaar (1,500), dhai sau (250), saade teen hazaar (3,500), paune do hazaar (1,750), sava sau (125).</li>
+      <li><b>All 99 irregular Hindi numbers</b>, compounds like "ek hazaar do sau pachaas", English words, digits, ₹ and Indian digit grouping (1,25,000).</li>
+      <li><b>Marathi:</b> पाचशे (500), दीड हजार (1,500), शंभर (100), case endings such as राधाला.</li>
+      <li><b>Devanagari or Roman</b>, mixed in one sentence, with Hindi schwa deletion (कितना → kitnaa).</li>
+      <li><b>No false money:</b> the last "do" in "Sunita ko do hazaar do" is a verb ("give"), and Marathi "हजर" (present) is not ₹1,000.</li>
+    </ul>
+    <ul>
+      <li><b>Names as recognisers hear them:</b> Sunita, Suneeta, Sunitha and सुनीता reach the same member; Laxmi = Lakshmi.</li>
+      <li><b>Asks instead of guessing:</b> with two Sunitas in a group, it asks "Sunita Kumari or Sunita Yadav?".</li>
+      <li><b>Rule-based on purpose:</b> understanding runs on the phone in milliseconds, works offline, costs nothing and never invents an amount.</li>
+      <li><b>Tested at scale:</b> 91,000 spoken Hindi amounts parsed back exactly; every on-screen example tested in all three languages.</li>
+    </ul>
   </div>
-  <ul>
-    <li><b>Members</b>: hear and check every entry, ask their own balance by voice, get a receipt.</li>
-    <li><b>Group leaders and bookkeepers</b>: no more writing the register twice or carrying it alone.</li>
-    <li><b>Community resource persons, village organisations and banks</b>: clean, verifiable records for bank linkage and audits.</li>
-  </ul>
 </section>
 
+<!-- 6 -->
 <section class="slide">
   <span class="num">6</span>
-  <h2>What it depends on, and what happens if it gets costly or stops</h2>
+  <p class="section">Product: built and working today</p>
+  <h2>A working product, not a mock-up</h2>
+  <div class="cols small">
+    <ul>
+      <li><b>Meeting by voice:</b> attendance, savings, repayments, loans with leader approval, corrections by reversal, balance questions, cash count, closing summary.</li>
+      <li><b>Tamper-evident ledger:</b> every entry stores the SHA-256 of the one before; the server re-verifies the chain and every field on each sync.</li>
+      <li><b>Bank report</b> (PDF), spreadsheet (CSV), and a receipt per member, read aloud or sent on WhatsApp.</li>
+      <li><b>Offline-first:</b> the ledger lives on the phone and syncs when signal returns; installable as an app.</li>
+      <li><b>Live view:</b> an NGO worker or bank officer follows a group with a 6-letter code and sees entries appear within seconds.</li>
+    </ul>
+    <ul>
+      <li><b>Website</b> in Hindi, Marathi and English, with a meeting playing live.</li>
+      <li><b>Accounts:</b> mobile number and PIN, like UPI; PINs stored only as scrypt hashes; lockout after wrong PINs.</li>
+      <li><b>One-click trial:</b> a guest account and a 12-member group, ready in seconds, guided by Sakhi Didi.</li>
+      <li><b>Dashboard</b> of every group a person runs or follows: cash, savings, loans out, last meeting, ledger intact.</li>
+      <li><b>One container:</b> website, API and database start with "docker compose up". No keys.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <span class="num">7</span>
+  <p class="section">Proof</p>
+  <h2>Stress-tested, not demo-tested: 158 automated tests</h2>
+  <div class="cols small">
+    <ul>
+      <li>91,000 spoken Hindi amounts (10 to 99,999) parsed back exactly.</li>
+      <li>600 random meetings of 45 noisy sentences each (Hinglish, Devanagari, half-sentences, silence, gibberish), checked after every sentence: the chain stays valid, cash never goes negative, no loan goes below zero, no money is written without a "yes", no member is added twice.</li>
+      <li>Whole spoken meetings in Hindi, Marathi and English through the real engine.</li>
+      <li>Every phrase the coach can suggest, tried in the state it is suggested.</li>
+      <li>API tests over real HTTP: sign-up, lockout, guest trial, sync, tampered or nonsensical entries refused, read-only followers.</li>
+    </ul>
+    <div>
+      <p style="font-weight:700;margin-bottom:8px">Nine real bugs found by these tests, all fixed:</p>
+      <ul>
+        <li>"tees" (30) was being saved as ₹23</li>
+        <li>पचहत्तर (75) was not understood</li>
+        <li>An overpaid loan could go below zero (now: loan closed, rest to savings)</li>
+        <li>An unanswered loan approval could freeze the meeting</li>
+        <li>"Which Sunita?" could ask forever</li>
+        <li>A sentence could become a new member's name</li>
+        <li>The same person could be added in English and in Hindi</li>
+        <li>Two quick taps could overwrite each other's entry</li>
+        <li>A view-only follower's phone could record entries</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <span class="num">8</span>
+  <p class="section">How it works</p>
+  <h2>Simple, cheap and private by design</h2>
+  <div class="cols small">
+    <ul>
+      <li><b>Speech to text</b> in the browser (hi-IN, mr-IN, en-IN), keeping the recogniser's alternative guesses.</li>
+      <li><b>Transliteration</b> of Devanagari to one Roman form, then the <b>money parser</b> and the <b>name matcher</b>.</li>
+      <li><b>Intent:</b> start, attendance, entry, yes, no, approve, question, undo, cash count, new member, close.</li>
+      <li><b>Meeting state machine:</b> a pure function (state, what was heard, ledger) → (new state, reply, entries), so every meeting can be replayed in a test.</li>
+      <li><b>Reply</b> spoken in the chosen language by the phone's clearest voice, one sentence at a time, and shown on screen.</li>
+    </ul>
+    <ul>
+      <li><b>Ledger:</b> append-only, SHA-256 hash chain, reversals instead of edits, cash counts locked in.</li>
+      <li><b>Storage:</b> IndexedDB on the phone; SQLite on our server for accounts, groups and the cloud copy.</li>
+      <li><b>Sync:</b> append-only; the server re-checks the chain and every field; if two phones split, the server's copy is kept and the phone is told.</li>
+      <li><b>Security:</b> scrypt PINs, hashed session tokens in HttpOnly cookies, rate limits, JSON-only writes, read-only followers.</li>
+      <li><b>No AI API, no paid speech, no SMS:</b> ₹0 cost per meeting today.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <span class="num">9</span>
+  <p class="section">Addressable market</p>
+  <h2>Addressable market: about 90 lakh groups, 9 crore+ women</h2>
   <table>
-    <tr><th style="width:26%">Dependency</th><th style="width:30%">Used for</th><th>If it gets costly or stops working</th></tr>
-    <tr><td>Browser speech recognition (Chrome, Android)</td><td>Speech to text in hi-IN, mr-IN, en-IN</td><td>Free today, but needs internet. The engine only needs text, so an on-device model or an Indian speech API (Bhashini, Sarvam) can be swapped in behind one function. Typing and tap buttons always work, offline.</td></tr>
-    <tr><td>Browser speech synthesis</td><td>Speaking replies</td><td>Free and on-device. If a language voice is missing, it uses the Hindi voice and still shows the text.</td></tr>
-    <tr><td>No AI model</td><td>Parsing, name matching, ledger</td><td>All rule-based and on the phone: no per-meeting cost, no outage risk, and no invented amounts.</td></tr>
-    <tr><td>Our own server (Node + SQLite)</td><td>Accounts, groups, cloud copy, dashboard</td><td>Built-in modules only, one container. If it is down, meetings carry on offline on the phone and sync later.</td></tr>
+    <tr><th style="width:18%">Layer</th><th style="width:30%">Who</th><th style="width:20%">Size</th><th>Why this layer</th></tr>
+    <tr><td><b>Total (TAM)</b></td><td>Every Self-Help Group in India</td><td>~90 lakh groups, 9 crore+ women (DAY-NRLM)</td><td>Every group holds a weekly or monthly meeting with money and a register.</td></tr>
+    <tr><td><b>Serviceable (SAM)</b></td><td>Groups in Hindi- and Marathi-speaking states, where the product already works (UP, Bihar, MP, Rajasthan, Jharkhand, Chhattisgarh, Haryana, Uttarakhand, Himachal, Delhi, Maharashtra)</td><td>Roughly 35–45 lakh groups (our estimate)</td><td>Speech, replies, numbers and names are built and tested for Hindi and Marathi.</td></tr>
+    <tr><td><b>Obtainable (SOM), 3 years</b></td><td>Groups reached through NGO partners and their community resource persons</td><td>50,000 groups (target)</td><td>One resource person supports dozens of groups; a few partners reach thousands.</td></tr>
+  </table>
+  <p class="note">Also served at every group: the leader, the bookkeeper, the NGO worker or CRP who follows it, and the bank branch that lends to it. The SAM figure is our rough estimate from the states listed, not an official count.</p>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <span class="num">10</span>
+  <p class="section">Addressable market: alternatives and business model</p>
+  <h2>What groups use today, and how Bolta Khata pays for itself</h2>
+  <div class="cols small">
+    <table>
+      <tr><th>Today</th><th>Gap</th></tr>
+      <tr><td><b>Paper register</b></td><td>One reader, no checks, lost or damaged books, late audits.</td></tr>
+      <tr><td><b>LokOS (government app)</b></td><td>Typed by the bookkeeper; the group cannot hear or check entries.</td></tr>
+      <tr><td><b>EShakti (NABARD) and bank apps</b></td><td>Digitise records for banks, not the meeting itself.</td></tr>
+      <tr><td><b>General bookkeeping apps</b></td><td>Built for shopkeepers who read and type; not for a group.</td></tr>
+      <tr><td><b>Bolta Khata</b></td><td>The whole group speaks, hears and confirms; locked records; works offline; complements LokOS with export.</td></tr>
+    </table>
+    <ul>
+      <li><b>Free for every Self-Help Group</b>, always. The group never pays.</li>
+      <li><b>Paid by the institutions that benefit:</b> State Rural Livelihood Missions, NGOs and banks pay per group per year for the dashboard, live view, reports and support. Proposed pilot price: ₹600 per group per year (₹50 a month).</li>
+      <li><b>At the 3-year target</b> of 50,000 groups, that is about ₹3 crore a year.</li>
+      <li><b>Cost to serve is low:</b> no AI or speech fees today; one small server handles thousands of groups (each meeting is only a few dozen ledger entries).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <span class="num">11</span>
+  <p class="section">Third-party dependencies: cost and availability</p>
+  <h2>What we rely on, what it costs, what could go wrong</h2>
+  <table class="tight">
+    <tr><th style="width:21%">Dependency</th><th style="width:20%">Used for</th><th style="width:15%">Cost today</th><th>Availability risk</th></tr>
+    <tr><td><b>Browser speech recognition</b> (Web Speech API in Chrome, Edge, Android; Google's service in Chrome)</td><td>Speech to text in Hindi, Marathi, English</td><td>Free</td><td>Needs internet; no service guarantee; quality varies with the room and accent; not in Firefox; the provider could change or limit it.</td></tr>
+    <tr><td><b>Phone speech voices</b> (Android, Windows, Edge neural voices)</td><td>Speaking replies</td><td>Free, on device</td><td>Some phones lack a Marathi voice (falls back to Hindi); voice quality varies by device.</td></tr>
+    <tr><td><b>Open-source software</b> (Node.js with built-in SQLite, React, Vite, Tailwind)</td><td>App, API, database</td><td>Free, MIT and similar licences</td><td>Very low; no paid licence, no vendor lock-in.</td></tr>
+    <tr><td><b>Hosting</b> (any Docker host or Indian cloud)</td><td>Accounts, groups, cloud copy, live view</td><td>Small server, a few thousand ₹ a month at pilot scale (estimate)</td><td>Server down: meetings carry on offline and sync later.</td></tr>
+    <tr><td><b>Google Fonts</b> (Hind, Yatra One); <b>WhatsApp</b> share links</td><td>Lettering; sending receipts</td><td>Free</td><td>Fonts fall back to system fonts; receipts can also be read aloud or printed.</td></tr>
+    <tr><td><b>Not used:</b> LLM or AI APIs, paid speech APIs, SMS or OTP providers, payment gateways</td><td colspan="3">Deliberately avoided: no per-meeting cost, no outage from a model provider, and amounts are never invented.</td></tr>
   </table>
 </section>
 
+<!-- 12 -->
 <section class="slide">
-  <span class="num">7</span>
-  <h2>Launch plan: reach the first groups through the people they already trust</h2>
-  <div class="cols">
-    <ol>
-      <li><b>Pilot</b>: 30 groups in two districts (Hindi and Marathi), with an NGO partner and its community resource persons, who already visit these meetings.</li>
-      <li><b>Side by side</b>: paper register and app for three months, compared at every monthly check.</li>
-      <li><b>One-click trial</b>: any group or NGO can try a full group in seconds, guided by Sakhi; workers watch meetings live.</li>
-    </ol>
-    <ol start="4">
-      <li><b>Grow</b> through cluster-level federations and State Rural Livelihood Missions: one resource person follows dozens of groups on one dashboard with join codes.</li>
-      <li><b>Fit in</b>: export to LokOS and bank formats, so it adds to existing systems instead of replacing them.</li>
-      <li><b>Free for groups</b>; paid per group per year by missions, NGOs or banks that want reliable records.</li>
-    </ol>
+  <span class="num">12</span>
+  <p class="section">Third-party dependencies: risk plan</p>
+  <h2>If a dependency gets costly or stops, the meeting does not</h2>
+  <div class="cols small">
+    <ul>
+      <li><b>If browser recognition stops or is limited:</b> the engine only needs text, so recognition is swapped behind one function: an on-device model (open-source Indian-language speech models) for fully offline use, or the government's Bhashini platform, or a commercial Indian speech API.</li>
+      <li><b>If speech becomes paid:</b> at a typical ₹0.5–1.5 per audio minute (assumption) and about 10 minutes of speech per meeting, cost is ₹5–15 a meeting, ₹260–780 a group a year. On-device models bring this back to zero; the pilot price covers the middle case.</li>
+      <li><b>If there is no internet:</b> typing and big buttons always work offline; the ledger is saved on the phone and syncs later.</li>
+    </ul>
+    <ul>
+      <li><b>If a phone has no good voice:</b> the app picks the clearest one available, falls back to Hindi for Marathi, and always shows the text; each phone can choose its voice and speed.</li>
+      <li><b>If our server is down:</b> meetings, reports and receipts still work on the phone; sync resumes when it returns.</li>
+      <li><b>If hosting costs rise:</b> one container runs on any Docker host, including Indian clouds; SQLite needs no separate database service.</li>
+      <li><b>Mishearing money</b> is the main product risk: nothing is saved without the group's "sahi hai", large amounts are confirmed twice, and every correction stays visible in the hash chain.</li>
+    </ul>
   </div>
 </section>
 
+<!-- 13 -->
 <section class="slide">
-  <span class="num">8</span>
-  <h2>How we will know it works, and the main risk</h2>
-  <div class="cols">
+  <span class="num">13</span>
+  <p class="section">Go-to-market plan</p>
+  <h2>Go-to-market: reach groups through the people they already trust</h2>
+  <table>
+    <tr><th style="width:17%">Phase</th><th style="width:15%">When</th><th>What we do</th><th style="width:16%">Groups</th></tr>
+    <tr><td><b>1. Pilot</b></td><td>Months 1–3</td><td>30 groups in two districts (one Hindi, one Marathi) with one NGO partner and its community resource persons. App and paper register side by side, compared at every monthly check.</td><td>30</td></tr>
+    <tr><td><b>2. Partners</b></td><td>Months 4–12</td><td>Two to five NGOs and a cluster-level federation. Each resource person follows all her groups on one dashboard with join codes; one-click trial and Sakhi Didi onboard new groups without a trainer.</td><td>300 → 2,000</td></tr>
+    <tr><td><b>3. Missions and banks</b></td><td>Year 2</td><td>A State Rural Livelihood Mission pilot block; bank branches use the meeting history and cash counts before lending. LokOS-format export so it fits the existing system.</td><td>10,000</td></tr>
+    <tr><td><b>4. Scale</b></td><td>Year 3</td><td>More states and languages (Bhashini or on-device speech), feature-phone access by missed call, paid institutional plans.</td><td>50,000</td></tr>
+  </table>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <span class="num">14</span>
+  <p class="section">Go-to-market: channels and onboarding</p>
+  <h2>How a group starts using it, in one meeting</h2>
+  <div class="cols small">
+    <ul>
+      <li><b>Channel:</b> community resource persons and NGO field staff, who already attend these meetings and are trusted by the group.</li>
+      <li><b>First meeting:</b> the resource person opens the one-click trial or creates the group with its real cash; Sakhi Didi explains the screen aloud; members add themselves by voice ("naya sadasya: Pushpa Devi").</li>
+      <li><b>The leader learns three sentences</b> ("meeting shuru karo", "sahi hai", "meeting band karo"); the coach on screen teaches the rest.</li>
+      <li><b>One phone per group</b> is enough: the leader's or the resource person's.</li>
+      <li><b>Proof for funders:</b> the live view and dashboard show the NGO or mission every group's meetings without travelling.</li>
+    </ul>
+    <ul>
+      <li><b>Pilot targets:</b> 80% of members can state their own balance without help; under 2% mismatch with the paper register; a 15-member meeting recorded in under 30 minutes; 70% of groups still using it by choice after three months.</li>
+      <li><b>Pricing:</b> free for groups; ₹600 per group per year for institutions (proposed), free during pilots.</li>
+      <li><b>Why they say yes:</b> fewer disputes, cleaner books for bank linkage, cash checked every meeting, and no training cost.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <span class="num">15</span>
+  <p class="section">Next</p>
+  <h2>What we will build at the finale, and what we are asking for</h2>
+  <div class="cols small">
+    <ul>
+      <li>On-device speech recognition, so the whole meeting works with no internet.</li>
+      <li>Missed-call and voice-call access, so members with feature phones can hear their own balance.</li>
+      <li>Speaker check on loan approval, so only the leader's own voice can say "manzoor".</li>
+      <li>Encrypted backup and LokOS-format export.</li>
+      <li>More languages through Bhashini.</li>
+    </ul>
     <div>
-      <p style="font-weight:600;margin-bottom:10px">Targets for the pilot</p>
-      <ul>
-        <li>80% of members can state their own balance without help.</li>
-        <li>Under 2% mismatch with the paper register.</li>
-        <li>A 15-member meeting recorded in under 30 minutes.</li>
-        <li>70% of groups still using it after three months, by choice.</li>
-      </ul>
-    </div>
-    <div>
-      <p style="font-weight:600;margin-bottom:10px">Main risk: mishearing money</p>
-      <p>A noisy room and strong accents can produce a wrong name or amount, and one wrong entry can break trust. That is why nothing is saved without the group's "sahi hai", large amounts are confirmed twice, and the hash chain keeps every correction visible.</p>
+      <p><b>We are asking for:</b> an NGO or State Rural Livelihood Mission partner for the 30-group pilot, and introductions to banks that lend to Self-Help Groups.</p>
+      <p style="margin-top:18px"><b>Try it now:</b> github.com/skypank-coder/bolta-khata, then "docker compose up" and "Try it in one click".</p>
+      <p style="margin-top:18px;font-family:'Yatra One';font-size:30px;color:#9E1B1F">बोलिए, सुनिए, सही है।</p>
+      <p>Speak. Listen. Sahi hai.</p>
     </div>
   </div>
-  <p class="foot">github.com/skypank-coder/bolta-khata</p>
 </section>
 
 </body>

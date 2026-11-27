@@ -1,28 +1,29 @@
-# Round 2 submission text
+# Round 2 submission: what to fill in
 
-Ready-to-paste text for each field of the submission form. Edit freely; keep it true.
+| Form field | What to enter |
+|---|---|
+| This build is | **An extension of my Round 1 idea** |
+| Project name | **Bolta Khata** |
+| Theme | **Livelihoods and small business** |
+| State | The state where you are based |
+| 1 · Code on GitHub | https://github.com/skypank-coder/bolta-khata |
+| 2 · YouTube demo | Your unlisted YouTube link (3 minutes or less; script in `docs/DEMO_SCRIPT.md`) |
+| 3 · Pitch deck (PDF) | `docs/Bolta-Khata-Pitch-Deck.pdf` (16 pages, under 1 MB) |
+| 4 · Live link (optional) | Leave empty unless you deploy it; never a reason to fail |
+
+**Before you submit:** keep the GitHub repo public and the YouTube video public or unlisted **until 2 Dec**, because the team will test every link. Tick the four checkboxes only after checking each one.
+
+**The deck covers every required topic, in this order:** problem and solution (slides 1–5), product and proof (6–8), addressable market (9–10), third-party dependencies with their cost and availability risks (11–12), and the go-to-market plan (13–15). Only the text is read, so every key point is written as text.
 
 ---
 
-## Theme
-Livelihoods and small business
+## Short descriptions (if anyone asks, or for social posts)
 
-## This build is
-An extension of my Round 1 idea
+**Pain point.** Over 9 crore rural women save and borrow through about 90 lakh Self-Help Groups. One member writes the money into a paper register that often only she can read, so members cannot check their own entries, mistakes surface months later, cash rarely matches the register, and banks hesitate to lend.
 
-## Pain point being solved
+**Impact.** Bolta Khata runs the weekly SHG meeting by voice in Hindi, Marathi and English. Each member speaks her entry, the phone reads it back to the whole group, and it is written only after "sahi hai", then hash-locked so nobody can quietly change it. The cash box is counted by voice at every meeting, members can ask their own balance any time, leaders get the bank report and receipts automatically, and NGO workers follow groups live. It works offline, costs nothing per meeting, and needs no training.
 
-Over 9 crore rural women in India save and borrow through about 90 lakh Self-Help Groups. Every week, 10 to 15 members hand over money, and one member writes it into a paper register that often only she can read. Members cannot check what was written against their own name, mistakes and misuse surface months later as fights or missing money, the records stop when the bookkeeper is absent, and the cash in the box rarely matches the register. Banks want clean books before lending, so a messy register costs the whole group credit. Existing apps such as LokOS are typed by the same bookkeeper, so one woman stays in control. The meeting already happens out loud; the record does not.
-
-## Impact in real-world India
-
-Bolta Khata runs the weekly SHG meeting by voice in Hindi, Marathi and English. Each member speaks her own entry ("main Meena, sau rupaye bachat"), the phone reads it back to the whole group, and it is written only after the group says "sahi hai". Entries are hash-locked, so nobody can quietly change the register, and the cash box is counted by voice and checked against the khata at every meeting. Members can ask their own balance at any time; leaders get the bank report and a receipt for every member automatically; NGO workers and bank officers follow groups live with a join code. It works offline, costs nothing per meeting, and needs no training: a coach shows the exact words to say next and Sakhi Didi, an animated guide, explains every screen aloud. Pilot targets: 80% of members able to state their own balance, under 2% mismatch with the paper register, a 15-member meeting recorded in under 30 minutes.
-
-## 3-minute screen recording
-Show the core flow by voice: see `docs/DEMO_SCRIPT.md`.
-
-## GitHub project link
-https://github.com/skypank-coder/bolta-khata
+---
 
 ## How you used Wispr Flow to build
 

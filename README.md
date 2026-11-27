@@ -51,7 +51,7 @@ docker compose up --build
 | Starts and shows its main screen **without any secret keys** | ✅ no keys exist anywhere in the project |
 | `.env.example` if environment variables are used; starts without `.env` | ✅ every variable is optional with a default ([`.env.example`](.env.example)) |
 | Own code written during the hackathon (about 300+ lines) | ✅ **6,826 lines** of app and server code plus **992 lines of tests**, in **62 commits** from 27 to 28 Nov 2026 |
-| Demo video ≤ 3 min, pitch deck PDF | ✅ [`docs/Bolta-Khata-Pitch-Deck.pdf`](docs/Bolta-Khata-Pitch-Deck.pdf), video script in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md), form text in [`docs/SUBMISSION.md`](docs/SUBMISSION.md) |
+| Demo video ≤ 3 min, pitch deck PDF | ✅ [`docs/Bolta-Khata-Pitch-Deck.pdf`](docs/Bolta-Khata-Pitch-Deck.pdf): 16 pages covering problem and solution, addressable market, third-party dependencies with cost and availability risks, and go-to-market, video script in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md), form text in [`docs/SUBMISSION.md`](docs/SUBMISSION.md) |
 | Main task done by speaking | ✅ the whole meeting (attendance, money, questions, loans, corrections, cash count, closing) runs by voice |
 
 ---
