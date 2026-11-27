@@ -103,6 +103,11 @@ function hi(r: Reply, f: Fmt): string {
     case 'notUnderstood': return 'समझ नहीं आया। ऐसे बोलिए: मैं मीना, सौ रुपये बचत।';
     case 'help': return 'नाम, रकम और बचत या किस्त बोलिए। जैसे: मैं मीना, सौ रुपये बचत, पाँच सौ किस्त। अपना हिसाब सुनने के लिए: मेरा कितना जमा है?';
     case 'alreadyClosed': return 'आज की मीटिंग बंद हो चुकी है। नई मीटिंग के लिए बोलिए: मीटिंग शुरू करो।';
+    case 'addMemberAsk': return `नया सदस्य: ${r.name}। सही है?`;
+    case 'memberAdded': return `${r.name} समूह में जुड़ गईं। स्वागत है! अब ${r.count} सदस्य हैं।`;
+    case 'memberExists': return `${f.name(r.member)} पहले से समूह में हैं।`;
+    case 'needNewName': return 'नए सदस्य का पूरा नाम बोलिए।';
+    case 'noMembers': return 'समूह में अभी कोई सदस्य नहीं है। पहले बोलिए: नया सदस्य, और नाम।';
     case 'cashCount': {
       const d = r.counted - r.expected;
       if (d === 0) return `नकद ${f.money(r.counted)}। खाते से पूरा मिलता है।`;
@@ -156,6 +161,11 @@ function mr(r: Reply, f: Fmt): string {
     case 'notUnderstood': return 'समजलं नाही. असं सांगा: मी मीना, शंभर रुपये बचत.';
     case 'help': return 'नाव, रक्कम आणि बचत किंवा हप्ता सांगा. उदा: मी मीना, शंभर रुपये बचत. आपला हिशोब ऐकायला: माझी किती बचत आहे?';
     case 'alreadyClosed': return 'आजची मीटिंग बंद झाली आहे. नवीन मीटिंगसाठी सांगा: मीटिंग सुरू करा.';
+    case 'addMemberAsk': return `नवीन सदस्य: ${r.name}. बरोबर आहे का?`;
+    case 'memberAdded': return `${r.name} गटात सामील झाल्या. स्वागत! आता ${r.count} सदस्य आहेत.`;
+    case 'memberExists': return `${f.name(r.member)} आधीच गटात आहेत.`;
+    case 'needNewName': return 'नवीन सदस्याचं पूर्ण नाव सांगा.';
+    case 'noMembers': return 'गटात अजून कोणी सदस्य नाही. आधी सांगा: नवीन सदस्य, आणि नाव.';
     case 'cashCount': {
       const d = r.counted - r.expected;
       if (d === 0) return `रोख ${f.money(r.counted)}. खात्याशी पूर्ण जुळते.`;
@@ -209,6 +219,11 @@ function en(r: Reply, f: Fmt): string {
     case 'notUnderstood': return 'I did not understand. Say it like this: I am Meena, one hundred rupees savings.';
     case 'help': return 'Say a name, an amount, and savings or repayment. For example: I am Meena, one hundred savings, five hundred repayment. To hear your balance: how much have I saved?';
     case 'alreadyClosed': return 'Today\'s meeting is closed. To start a new one, say: start the meeting.';
+    case 'addMemberAsk': return `New member: ${r.name}. Is that right?`;
+    case 'memberAdded': return `${r.name} has joined the group. Welcome! There are now ${r.count} members.`;
+    case 'memberExists': return `${f.name(r.member)} is already in the group.`;
+    case 'needNewName': return 'Say the new member\'s full name.';
+    case 'noMembers': return 'The group has no members yet. First say: add member, and her name.';
     case 'cashCount': {
       const d = r.counted - r.expected;
       if (d === 0) return `Cash counted: ${f.money(r.counted)}. It matches the ledger exactly.`;
@@ -229,19 +244,19 @@ export function render(r: Reply, lang: Lang, members: Member[]): Rendered {
 /** Example phrases shown as tappable chips: say them, or tap to try without a mic. */
 export const EXAMPLES: Record<Lang, Record<'idle' | 'attendance' | 'entries' | 'closed', string[]>> = {
   hi: {
-    idle: ['मीटिंग शुरू करो'],
+    idle: ['मीटिंग शुरू करो', 'नया सदस्य: पुष्पा देवी'],
     attendance: ['मैं मीना हूँ', 'राधा हाज़िर', 'सुनीता यादव', 'हाज़िरी पूरी'],
     entries: ['मैं मीना, सौ रुपये बचत', 'रेखा की किस्त पाँच सौ', 'राधा को डेढ़ हज़ार लोन', 'मेरा कितना जमा है?', 'पिछली एंट्री हटाओ', 'मीटिंग बंद करो', 'हाथ में बीस हज़ार है'],
     closed: ['मीटिंग शुरू करो'],
   },
   mr: {
-    idle: ['मीटिंग सुरू करा'],
+    idle: ['मीटिंग सुरू करा', 'नवीन सदस्य: पुष्पा'],
     attendance: ['मी मीना', 'राधा हजर', 'हजेरी पूर्ण'],
     entries: ['मी मीना, शंभर रुपये बचत', 'रेखा हप्ता पाचशे', 'राधाला दीड हजार कर्ज', 'माझी किती बचत आहे?', 'मीटिंग बंद करा'],
     closed: ['मीटिंग सुरू करा'],
   },
   en: {
-    idle: ['Start the meeting'],
+    idle: ['Start the meeting', 'Add member Pushpa Devi'],
     attendance: ['I am Meena', 'Radha present', 'Attendance done'],
     entries: ['Meena, 100 rupees savings', 'Rekha repayment 500', 'Radha loan 1500', 'How much have I saved?', 'Undo', 'End the meeting'],
     closed: ['Start the meeting'],

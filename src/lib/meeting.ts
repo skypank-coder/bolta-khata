@@ -1,4 +1,5 @@
-import { parseIntent, type EntryIntent, type Intent, type MoneyType } from './intent';
+import { extractNewName, parseIntent, romanName, type EntryIntent, type Intent, type MoneyType } from './intent';
+import { hasDevanagari } from './translit';
 import {
   computeBalances, memberBalance, meetingTotals, newId, reversedIds,
   type EntryDraft, type LedgerEntry,
@@ -33,7 +34,9 @@ export type Pending =
   | { kind: 'needAmount'; memberId: string; type: MoneyType }
   | { kind: 'needType'; memberId: string; amount: number }
   | { kind: 'pickMember'; options: [string, string]; then: Continuation }
-  | { kind: 'confirmClose' };
+  | { kind: 'confirmClose' }
+  | { kind: 'confirmNewMember'; member: Member; spoken: string }
+  | { kind: 'needNewName' };
 
 export interface MeetingState {
   phase: Phase;
@@ -76,12 +79,19 @@ export type Reply =
   | { key: 'notUnderstood' }
   | { key: 'help' }
   | { key: 'alreadyClosed' }
-  | { key: 'cashCount'; counted: number; expected: number };
+  | { key: 'cashCount'; counted: number; expected: number }
+  | { key: 'addMemberAsk'; name: string }
+  | { key: 'memberAdded'; name: string; count: number }
+  | { key: 'memberExists'; member: string }
+  | { key: 'needNewName' }
+  | { key: 'noMembers' };
 
 export interface StepResult {
   state: MeetingState;
   reply: Reply;
   drafts: EntryDraft[];
+  /** A member the group just added by voice. */
+  newMember?: Member;
 }
 
 export interface Heard {
@@ -288,7 +298,33 @@ export function step(state: MeetingState, heard: Heard, ctx: Ctx): StepResult {
     }
   }
 
+  // Adding a member works at any time, even before the first meeting.
+  if (s.pending?.kind === 'confirmNewMember') {
+    const p = s.pending;
+    if (intent.kind === 'confirm' || intent.kind === 'approve') {
+      const count = ctx.members.length + 1;
+      return {
+        ...reply({ ...s, pending: null }, { key: 'memberAdded', name: p.member.nameLocal ?? p.member.name, count }, [{
+          type: 'member_join', memberId: p.member.id, amount: 0, meetingId: s.meetingId, spoken: p.spoken, note: p.member.name,
+        }]),
+        newMember: p.member,
+      };
+    }
+    if (intent.kind === 'reject') return reply({ ...s, pending: null }, { key: 'rejected' });
+    if (intent.kind !== 'addMember') return reply(s, { key: 'confirmWaiting' });
+  }
+  if (s.pending?.kind === 'needNewName' || intent.kind === 'addMember') {
+    const name = intent.kind === 'addMember' ? intent.name : extractNewName(text);
+    if (!name) return reply({ ...s, pending: { kind: 'needNewName' } }, { key: 'needNewName' });
+    const same = ctx.members.find((m) => [m.name, m.nameLocal].some((n) => n && n.toLowerCase() === name.toLowerCase()));
+    if (same) return reply({ ...s, pending: null }, { key: 'memberExists', member: same.id });
+    const local = hasDevanagari(name) ? name : undefined;
+    const member: Member = { id: newId('m'), name: romanName(name), nameLocal: local, role: ctx.members.length ? 'member' : 'leader' };
+    return reply({ ...s, pending: { kind: 'confirmNewMember', member, spoken: text } }, { key: 'addMemberAsk', name });
+  }
+
   if (s.phase === 'idle' || s.phase === 'closed') {
+    if (intent.kind === 'start' && ctx.members.length === 0) return reply(s, { key: 'noMembers' });
     if (intent.kind === 'start') {
       const meetingId = newId('mtg');
       return reply({ ...initialState, phase: 'attendance', meetingId },

@@ -16,7 +16,8 @@ export type EntryType =
   | 'meeting_open'
   | 'meeting_close'
   | 'attendance'
-  | 'cash_count';   // leader counted the cash box: amount = counted, note = what the khata expected
+  | 'cash_count'
+  | 'member_join';  // a new member joined the group (note = her name)   // leader counted the cash box: amount = counted, note = what the khata expected
 
 export interface EntryDraft {
   type: EntryType;

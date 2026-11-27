@@ -1,6 +1,6 @@
 import { findAmounts, tokenize, type NumberSpan } from './numbers';
 import { matchMember, type MatchResult, type NamedMember } from './phonetic';
-import { fold } from './translit';
+import { fold, hasDevanagari, transliterate } from './translit';
 
 /**
  * Turns one spoken sentence (Hindi, Marathi, English or a mix, in Devanagari or Roman)
@@ -27,6 +27,7 @@ export type Intent =
   | { kind: 'repeat' }
   | { kind: 'queryGroup' }
   | { kind: 'cashCount'; amount: number }
+  | { kind: 'addMember'; name: string }
   | { kind: 'querySelf'; member: MatchResult; selfRef: boolean }
   | EntryIntent
   | { kind: 'name'; member: MatchResult }
@@ -64,6 +65,35 @@ const GROUP = w(['group', 'samuh', 'samooh', 'sabha', 'gat', 'sangh']);
 /** Words used when the cash box is counted: "haath mein 20,100 hai", "nakad gina 20100", "rokh 20100". */
 const CASH = w(['haath', 'hath', 'haat', 'nakad', 'nakd', 'nakdi', 'cash', 'rokad', 'rokh', 'rok', 'ginti', 'gina', 'gini',
   'ginkar', 'counted', 'count', 'hand', 'galla', 'peti', 'dabba', 'bakse', 'baksa']);
+
+/** "naya sadasya jodo: Pushpa Devi", "नया सदस्य पुष्पा देवी", "नवीन सदस्य", "add member Pushpa". */
+const ADD_MEMBER = ['naya sadasya', 'nayi sadasya', 'naye sadasya', 'naya member', 'nayi member', 'new member', 'add member',
+  'sadasya jodo', 'sadasya jodiye', 'member jodo', 'member add', 'navin sadasya', 'nava sadasya', 'navin member', 'sadasya joda',
+  'naya sadasy', 'sadasy jodo', 'nayi sadasy', 'naye sadasy', 'navin sadasy', 'nava sadasy', 'sadasy joro', 'sadasya joro',
+  'member joro', 'sadasy joda', 'sadasy jodi'];
+const NAME_FILLER = w(['naya', 'nayi', 'naye', 'navin', 'nava', 'new', 'sadasya', 'sadasy', 'member', 'add', 'jodo', 'jodiye',
+  'joro', 'joriye', 'jora', 'jodi', 'joriyega',
+  'joda', 'jodna', 'karo', 'kariye', 'kara', 'naam', 'name', 'hai', 'he', 'ka', 'ki', 'ke', 'ko', 'is', 'aahe', 'ahe', 'please',
+  'unka', 'unki', 'inka', 'inki', 'group', 'mein', 'me', 'samooh', 'samuh', 'gat', 'madhe', 'a', 'an', 'the', 'to', 'jodi']);
+
+/** The new member's name, in the script it was spoken in, with command words removed. */
+export function extractNewName(text: string): string {
+  return text
+    .split(/[\s,:;।.!?]+/)
+    .filter((word) => word && !NAME_FILLER.has(fold(transliterate(word))))
+    .join(' ')
+    .trim();
+}
+
+/** "पुष्पा देवी" -> "Pushpa Devi": a readable Roman spelling for reports and CSV. */
+export function romanName(name: string): string {
+  if (!hasDevanagari(name)) return name.replace(/\b\w/g, (c) => c.toUpperCase());
+  return transliterate(name)
+    .split(/\s+/)
+    .map((p) => p.replace(/aa$/, 'a').replace(/ee$/, 'i').replace(/oo$/, 'u'))
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join(' ');
+}
 
 const PHRASES = {
   start: ['meeting shuru', 'meeting suru', 'sabha shuru', 'baithak shuru', 'baithak suru', 'shuru karo', 'shuru kare', 'suru kara',
@@ -141,6 +171,7 @@ export function parseIntent(text: string, members: NamedMember[]): Intent {
   const joined = ` ${folded.join(' ')} `;
   const short = tokens.length <= 4;
 
+  if (hasPhrase(joined, ADD_MEMBER)) return { kind: 'addMember', name: extractNewName(text) };
   if (hasPhrase(joined, PHRASES.start)) return { kind: 'start' };
   if (hasPhrase(joined, PHRASES.end)) return { kind: 'end' };
   if ((hasPhrase(joined, PHRASES.attendanceWord) && hasPhrase(joined, PHRASES.attendanceDone)) || hasPhrase(joined, PHRASES.everyoneHere)) {

@@ -11,14 +11,16 @@ async function meeting() {
   let ledger: LedgerEntry[] = data.ledger;
   let state: MeetingState = initialState;
   const replies: Reply[] = [];
+  const members = [...data.group.members];
   const say = async (text: string, extra: { confidence?: number; alternatives?: string[] } = {}) => {
-    const r = step(state, { text, ...extra }, { members: data.group.members, ledger });
+    const r = step(state, { text, ...extra }, { members, ledger });
+    if (r.newMember) members.push(r.newMember);
     state = r.state;
     ledger = await appendEntries(ledger, r.drafts);
     replies.push(r.reply);
     return r.reply;
   };
-  return { say, get state() { return state; }, get ledger() { return ledger; }, members: data.group.members, replies };
+  return { say, get state() { return state; }, get ledger() { return ledger; }, members, replies };
 }
 
 describe('voice meeting, end to end', () => {
@@ -135,6 +137,7 @@ describe('examples shown on screen are understood', async () => {
     'मीटिंग सुरू करा': 'start', 'मी मीना': 'name', 'राधा हजर': 'name', 'हजेरी पूर्ण': 'attendanceDone',
     'मी मीना, शंभर रुपये बचत': 'entry', 'रेखा हप्ता पाचशे': 'entry', 'राधाला दीड हजार कर्ज': 'entry',
     'माझी किती बचत आहे?': 'querySelf', 'मीटिंग बंद करा': 'end',
+    'नया सदस्य: पुष्पा देवी': 'addMember', 'नवीन सदस्य: पुष्पा': 'addMember', 'Add member Pushpa Devi': 'addMember',
     'Start the meeting': 'start', 'I am Meena': 'name', 'Radha present': 'name', 'Attendance done': 'attendanceDone',
     'Meena, 100 rupees savings': 'entry', 'Rekha repayment 500': 'entry', 'Radha loan 1500': 'entry',
     'How much have I saved?': 'querySelf', 'Undo': 'undo', 'End the meeting': 'end',
@@ -284,4 +287,31 @@ describe('the self-playing demo meeting', async () => {
       expect((await verifyChain(m.ledger)).ok).toBe(true);
     });
   }
+});
+
+describe('adding members by voice', () => {
+  it('adds a member in Devanagari, confirms, and she can then save money', async () => {
+    const m = await meeting();
+    expect(await m.say('नया सदस्य जोड़ो: पुष्पा देवी')).toEqual({ key: 'addMemberAsk', name: 'पुष्पा देवी' });
+    expect(await m.say('हाँ सही है')).toMatchObject({ key: 'memberAdded', name: 'पुष्पा देवी', count: 13 });
+    const pushpa = m.members.at(-1)!;
+    expect(pushpa).toMatchObject({ name: 'Pushpa Devi', nameLocal: 'पुष्पा देवी' });
+    expect(m.ledger.at(-1)).toMatchObject({ type: 'member_join', memberId: pushpa.id });
+    await m.say('meeting shuru karo');
+    expect(await m.say('पुष्पा 100 बचत')).toMatchObject({ key: 'readback', drafts: [{ memberId: pushpa.id, amount: 100 }] });
+  });
+
+  it('asks for the name when only the command is said, and refuses duplicates', async () => {
+    const m = await meeting();
+    expect((await m.say('naya sadasya jodo')).key).toBe('needNewName');
+    expect(await m.say('Kavita Sharma')).toEqual({ key: 'addMemberAsk', name: 'Kavita Sharma' });
+    expect((await m.say('galat')).key).toBe('rejected');
+    expect(await m.say('add member Meena Devi')).toEqual({ key: 'memberExists', member: 'm01' });
+    expect(await m.say('नवीन सदस्य: सुमन')).toEqual({ key: 'addMemberAsk', name: 'सुमन' });
+  });
+
+  it('will not start a meeting for a group with no members', async () => {
+    const r = step(initialState, { text: 'meeting shuru karo' }, { members: [], ledger: [] });
+    expect(r.reply.key).toBe('noMembers');
+  });
 });
