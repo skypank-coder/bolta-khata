@@ -87,10 +87,14 @@ describe('voice meeting, end to end', () => {
     const m = await meeting();
     await m.say('meeting shuru karo');
     expect((await m.say('Anjali 200 kist')).key).toBe('noLoanToRepay');
+    // Kamla owes 1000 and pays 1500: loan closes, 500 goes to her savings.
     const over = await m.say('Kamla ki kist 1500');
-    expect(over).toMatchObject({ key: 'readback', warn: 'overpay', stage: 1 });
-    expect(await m.say('sahi')).toMatchObject({ key: 'readback', stage: 2 });
+    expect(over).toMatchObject({
+      key: 'readback', warn: 'overpay', after: { m08: 0 },
+      drafts: [{ type: 'repayment', amount: 1000 }, { type: 'savings', amount: 500 }],
+    });
     expect((await m.say('sahi')).key).toBe('saved');
+    expect(memberBalance(computeBalances(m.ledger), 'm08')).toMatchObject({ loanOutstanding: 0, savings: 3000 });
     expect((await m.say('Parvati ko ek lakh loan')).key).toBe('loanNoCash');
   });
 
@@ -203,5 +207,24 @@ describe('same meeting in Marathi and in English', () => {
     expect(computeBalances(m.ledger).groupCash).toBe(before - 1000);
     await m.say('pichli entry hatao');
     expect(computeBalances(m.ledger).groupCash).toBe(before);
+  });
+});
+
+describe('a meeting does not get stuck', () => {
+  it('moves on when someone speaks instead of approving a loan', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    expect((await m.say('Farida ko 200 loan')).key).toBe('loanAsk');
+    expect((await m.say('xyz')).key).toBe('loanWaiting');
+    expect((await m.say('Rekha 500 bachat')).key).toBe('readback');
+    expect(m.ledger.some((e) => e.type === 'loan' && e.memberId === 'm09' && e.meetingId !== 'history')).toBe(false);
+  });
+
+  it('answers a balance question while a confirmation waits', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    await m.say('Geeta 200 bachat');
+    expect(await m.say('Meena ki kitni bachat hai')).toMatchObject({ key: 'selfBalance', member: 'm01' });
+    expect((await m.say('sahi hai')).key).toBe('saved');
   });
 });

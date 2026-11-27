@@ -71,7 +71,7 @@ function hi(r: Reply, f: Fmt): string {
         ` ${f.name(id)} का बाकी लोन ${f.money(Math.max(v, 0))}।`).join('');
       const loan = r.loanAfter ? ` फिर ${f.money(r.loanAfter.amount)} का लोन।` : '';
       if (r.stage === 2) return `ध्यान से सुनिए। ${lines(r.drafts, 'hi', f)}।${after} पक्का सही है?`;
-      const warn = r.warn === 'overpay' ? ' किस्त बाकी लोन से ज़्यादा है।' : r.warn === 'large' ? ' रकम बड़ी है।' : '';
+      const warn = r.warn === 'overpay' ? ' किस्त बाकी लोन से ज़्यादा थी, इसलिए लोन पूरा चुका और बाकी पैसा बचत में गया।' : r.warn === 'large' ? ' रकम बड़ी है।' : '';
       return `${lines(r.drafts, 'hi', f)}।${after}${loan}${warn} सही है?`;
     }
     case 'saved': return 'लिख लिया।';
@@ -119,7 +119,7 @@ function mr(r: Reply, f: Fmt): string {
         ` ${f.name(id)} यांचं बाकी कर्ज ${f.money(Math.max(v, 0))}.`).join('');
       const loan = r.loanAfter ? ` नंतर ${f.money(r.loanAfter.amount)} कर्ज.` : '';
       if (r.stage === 2) return `नीट ऐका. ${lines(r.drafts, 'mr', f)}.${after} नक्की बरोबर?`;
-      const warn = r.warn === 'overpay' ? ' हप्ता बाकी कर्जापेक्षा जास्त आहे.' : r.warn === 'large' ? ' रक्कम मोठी आहे.' : '';
+      const warn = r.warn === 'overpay' ? ' हप्ता बाकी कर्जापेक्षा जास्त होता, म्हणून कर्ज पूर्ण फिटलं आणि उरलेले पैसे बचतीत गेले.' : r.warn === 'large' ? ' रक्कम मोठी आहे.' : '';
       return `${lines(r.drafts, 'mr', f)}.${after}${loan}${warn} बरोबर आहे का?`;
     }
     case 'saved': return 'लिहिलं.';
@@ -167,7 +167,7 @@ function en(r: Reply, f: Fmt): string {
         ` ${f.name(id)} still owes ${f.money(Math.max(v, 0))}.`).join('');
       const loan = r.loanAfter ? ` Then a loan of ${f.money(r.loanAfter.amount)}.` : '';
       if (r.stage === 2) return `Listen carefully. ${lines(r.drafts, 'en', f)}.${after} Are you sure?`;
-      const warn = r.warn === 'overpay' ? ' The repayment is more than the loan left.' : r.warn === 'large' ? ' This is a large amount.' : '';
+      const warn = r.warn === 'overpay' ? ' That is more than the loan left, so the loan is closed and the rest goes to savings.' : r.warn === 'large' ? ' This is a large amount.' : '';
       return `${lines(r.drafts, 'en', f)}.${after}${loan}${warn} Is that right?`;
     }
     case 'saved': return 'Saved.';

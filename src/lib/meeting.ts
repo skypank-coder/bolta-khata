@@ -174,12 +174,20 @@ function handleEntry(state: MeetingState, ctx: Ctx, entry: EntryIntent, spoken: 
 
   if (!drafts.length && loan) return askLoan(base, ctx, loan, spoken);
 
+  // Paying more than the loan left: the loan is closed and the extra goes into her savings,
+  // which is what the group does on paper. A loan can never go below zero.
   const overpay = repay > bal.loanOutstanding;
-  const large = drafts.some((d) => d.amount > LARGE_AMOUNT);
-  const after = { [memberId]: bal.loanOutstanding - repay };
+  let final = drafts;
+  if (overpay) {
+    const extra = repay - bal.loanOutstanding;
+    const savings = drafts.filter((d) => d.type === 'savings').reduce((s, d) => s + d.amount, 0) + extra;
+    final = [{ type: 'repayment', memberId, amount: bal.loanOutstanding }, { type: 'savings', memberId, amount: savings }];
+  }
+  const large = final.some((d) => d.amount > LARGE_AMOUNT);
+  const after = { [memberId]: Math.max(0, bal.loanOutstanding - repay) };
   return reply(
-    { ...base, pending: { kind: 'confirm', drafts, loanAfter: loan, doubleCheck: overpay || large, stage: 1, spoken } },
-    { key: 'readback', drafts, after, warn: overpay ? 'overpay' : large ? 'large' : undefined, stage: 1, loanAfter: loan },
+    { ...base, pending: { kind: 'confirm', drafts: final, loanAfter: loan, doubleCheck: large, stage: 1, spoken } },
+    { key: 'readback', drafts: final, after, warn: overpay ? 'overpay' : large ? 'large' : undefined, stage: 1, loanAfter: loan },
   );
 }
 
@@ -269,7 +277,15 @@ export function step(state: MeetingState, heard: Heard, ctx: Ctx): StepResult {
     const b = computeBalances(ctx.ledger);
     return reply(s, { key: 'groupBalance', cash: b.groupCash, savings: b.totalSavings, outstanding: b.totalOutstanding });
   }
-  if (intent.kind === 'querySelf' && !s.pending) return balanceQuery(s, ctx, intent.member, intent.selfRef);
+  if (intent.kind === 'querySelf') {
+    if (!s.pending) return balanceQuery(s, ctx, intent.member, intent.selfRef);
+    // A question in the middle of a confirmation is answered, and the confirmation still waits.
+    const who = resolveMember(intent.member, intent.selfRef, s);
+    if (who.id) {
+      const b = memberBalance(computeBalances(ctx.ledger), who.id);
+      return reply(s, { key: 'selfBalance', member: who.id, savings: b.savings, loan: b.loanOutstanding });
+    }
+  }
 
   if (s.phase === 'idle' || s.phase === 'closed') {
     if (intent.kind === 'start') {
@@ -292,8 +308,8 @@ export function step(state: MeetingState, heard: Heard, ctx: Ctx): StepResult {
             const b = memberBalance(computeBalances(ctx.ledger), p.drafts[0].memberId);
             const repay = p.drafts.filter((d) => d.type === 'repayment').reduce((t, d) => t + d.amount, 0);
             return reply({ ...s, pending: { ...p, stage: 2 } }, {
-              key: 'readback', drafts: p.drafts, after: { [p.drafts[0].memberId]: b.loanOutstanding - repay },
-              warn: repay > b.loanOutstanding ? 'overpay' : 'large', stage: 2, loanAfter: p.loanAfter,
+              key: 'readback', drafts: p.drafts, after: { [p.drafts[0].memberId]: Math.max(0, b.loanOutstanding - repay) },
+              warn: 'large', stage: 2, loanAfter: p.loanAfter,
             });
           }
           const drafts = commit(s, ctx, p.drafts, p.spoken);
@@ -317,7 +333,9 @@ export function step(state: MeetingState, heard: Heard, ctx: Ctx): StepResult {
           return reply({ ...s, pending: null }, { key: 'loanSaved', draft: p.draft }, commit(s, ctx, [p.draft], p.spoken));
         }
         if (intent.kind === 'reject') return reply({ ...s, pending: null }, { key: 'rejected' });
-        return reply(s, { key: 'loanWaiting' });
+        // Someone moved on to a new entry: an unapproved loan simply lapses (no money moved).
+        if (!['entry', 'name', 'end', 'undo', 'attendanceDone'].includes(intent.kind)) return reply(s, { key: 'loanWaiting' });
+        break;
       }
       case 'pickMember': {
         // Only compare against the two names we asked about ("Kumari" or "Yadav").
