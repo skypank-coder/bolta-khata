@@ -34,6 +34,8 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
       if (el.closest('input, textarea, select, button, [role=dialog]')) return;
+      // Never while Sakhi or a sheet is open, and never on a view-only screen.
+      if (document.querySelector('[role=dialog]') || app.readOnly) return;
       if (e.code === 'Space') { e.preventDefault(); app.toggleTalk(); }
       if (e.code === 'Escape') app.stopLoop();
     };

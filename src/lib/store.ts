@@ -38,6 +38,8 @@ export interface AppData {
   tamperBackup?: { index: number; entry: LedgerEntry };
   /** Last ledger seq the server has confirmed (cloud groups only). */
   syncedSeq?: number;
+  /** This account's role in the group, remembered so an offline follower's phone stays view-only. */
+  role?: 'owner' | 'viewer';
 }
 
 const DB_NAME = 'bolta-khata';

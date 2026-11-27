@@ -85,7 +85,7 @@ export function useBoltaKhata(opts: KhataOptions = {}) {
     syncedRef.current = serverSeq;
     if (!local) {
       membersRef.current = JSON.stringify(r.group.members);
-      return { group: r.group, ledger: r.entries, settings, syncedSeq: serverSeq };
+      return { group: r.group, ledger: r.entries, settings, syncedSeq: serverSeq, role: r.role };
     }
     const m = mergeLedgers(local.ledger, r.entries);
     setConflict(m.conflict);
@@ -96,6 +96,7 @@ export function useBoltaKhata(opts: KhataOptions = {}) {
       group: { ...r.group, members: keepLocalMembers ? local.group.members : r.group.members },
       ledger: m.ledger,
       syncedSeq: serverSeq,
+      role: r.role,
       tamperBackup: undefined,
     };
   }, [remoteId]);
@@ -138,6 +139,8 @@ export function useBoltaKhata(opts: KhataOptions = {}) {
       let d = await loadData(storageKey);
       if (remoteId) {
         syncedRef.current = d?.syncedSeq ?? 0;
+        // Until the server answers, trust the role this phone saw last time (offline followers stay view-only).
+        if (d?.role) { roleRef.current = d.role; setRole(d.role); }
         try {
           d = await pull(d);
         } catch (e) {
@@ -220,6 +223,7 @@ export function useBoltaKhata(opts: KhataOptions = {}) {
     const run = queueRef.current.then(async () => {
       const current = dataRef.current;
       if (!current) return null;
+      if (remoteId && roleRef.current === 'viewer') return null; // view-only: never write
       const r = step(stateRef.current, heard, { members: current.group.members, ledger: current.ledger });
       stateRef.current = r.state;
       setMstate(r.state);
@@ -239,7 +243,7 @@ export function useBoltaKhata(opts: KhataOptions = {}) {
     });
     queueRef.current = run.catch(() => undefined);
     return run;
-  }, [commitData]);
+  }, [commitData, remoteId]);
 
   /** One turn of the conversation: understand, write, answer out loud. */
   const process = useCallback(async (heard: { text: string; alternatives?: string[]; confidence?: number }, shownAs?: string) => {
@@ -316,11 +320,12 @@ export function useBoltaKhata(opts: KhataOptions = {}) {
 
   const toggleTalk = useCallback(() => {
     if (loopRef.current || demoRef.current || status !== 'idle') { stopLoop(); return; }
+    if (remoteId && roleRef.current === 'viewer') return;
     if (!sttSupported()) { setError('unsupported'); return; }
     setError(null);
     loopRef.current = true;
     void runLoop();
-  }, [runLoop, status, stopLoop]);
+  }, [remoteId, runLoop, status, stopLoop]);
 
   /** Typed text or a tapped example: goes through exactly the same engine. */
   const say = useCallback(async (text: string, shownAs?: string) => {

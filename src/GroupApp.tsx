@@ -52,6 +52,8 @@ export default function GroupApp({ options, onExit, startTour = false }: { optio
     if (!data || app.readOnly) return;
     const welcomeFirst = app.isDemo && !data.settings.welcomed;
     if ((startTour || !tourSeen('meeting')) && !welcomeFirst) {
+      // Drop "?tour=1" so a reload does not start the tour again.
+      if (window.location.hash.includes('?')) history.replaceState(null, '', window.location.hash.split('?')[0]);
       const t = setTimeout(() => setTouring(true), 700);
       return () => clearTimeout(t);
     }
