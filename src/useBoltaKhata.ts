@@ -32,6 +32,7 @@ export function useBoltaKhata() {
   const [level, setLevel] = useState(0);
   const [chain, setChain] = useState<ChainReport>({ ok: true, brokenAt: null, checked: 0 });
   const [stampKey, setStampKey] = useState(0);
+  const [demoPlaying, setDemoPlaying] = useState(false);
 
   const dataRef = useRef<AppData | null>(null);
   const stateRef = useRef<MeetingState>(initialState);
@@ -39,7 +40,6 @@ export function useBoltaKhata() {
   const listenRef = useRef<ListenHandle | null>(null);
   const exchangeId = useRef(0);
   const demoRef = useRef(false);
-  const [demoPlaying, setDemoPlaying] = useState(false);
 
   const commitData = useCallback((next: AppData) => {
     dataRef.current = next;
@@ -70,12 +70,13 @@ export function useBoltaKhata() {
 
   // Show the live mic level only while listening.
   useEffect(() => {
-    if (status !== 'listening') { setLevel(0); return; }
+    // The demo only pretends to listen: never ask for the microphone during it.
+    if (status !== 'listening' || demoPlaying) { setLevel(0); return; }
     let stop: (() => void) | null = null;
     let live = true;
     micLevel((l) => live && setLevel(l)).then((s) => { if (live) stop = s; else s(); });
     return () => { live = false; stop?.(); };
-  }, [status]);
+  }, [status, demoPlaying]);
 
   const lang: Lang = data?.settings.lang ?? 'hi';
 
