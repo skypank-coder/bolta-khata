@@ -11,11 +11,12 @@ Record the screen in Chrome at http://localhost:3000 (after `docker compose up -
 | 1:25–1:45 | Correction without deleting | "रेखा डेढ़ हज़ार बचत" · "ग़लत है" · "रेखा की किस्त पाँच सौ" · "सही है" |
 | 1:45–2:05 | Loan with leader approval and cash check | "राधा को ढाई हज़ार लोन" · "मंज़ूर" |
 | 2:05–2:15 | Member asks her own balance | "मेरा कितना जमा है?" |
-| 2:15–2:30 | Close the meeting | "मीटिंग बंद करो" · "सही है" |
+| 2:15–2:30 | Close the meeting and count the cash box | "मीटिंग बंद करो" · "हाथ में बीस हज़ार एक सौ है" (app says ₹100 short) · "सही है" |
 | 2:30–2:45 | Ledger tab: press "Try tampering", the ledger turns red; press "Put the original entry back" | (voice-over) "Every entry is locked to the one before it. A quiet edit shows exactly where." |
 | 2:45–3:00 | Report tab: bank report, CSV, tap "Play" and "WhatsApp" on a receipt | (voice-over) "A bank-ready report and a receipt for every member, read aloud in her language." |
 
 Tips
+- No mic, or want a perfect take? Press **पूरी डेमो मीटिंग चलाइए** and screen-record the meeting playing by itself, then talk over it.
 - Speak a little slower than normal, close to the laptop mic, in a quiet room.
 - If recognition mishears, that is fine on camera: say "ग़लत है" and repeat. It shows the safety net working.
 - Keep the video under 3:00. Upload to YouTube as Unlisted.
