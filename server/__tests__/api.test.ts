@@ -3,15 +3,16 @@ import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { appendEntries } from '../../src/lib/ledger';
 import { buildDemoData } from '../../src/lib/store';
-import { createHandler } from '../app';
+import { createHandler, sweepGuests } from '../app';
 import { normalisePhone } from '../auth';
 import { openDb } from '../db';
 
 let server: Server;
 let base = '';
+const db = openDb(':memory:');
 
 beforeAll(async () => {
-  server = createServer(createHandler(openDb(':memory:'), 'does-not-exist'));
+  server = createServer(createHandler(db, 'does-not-exist'));
   await new Promise<void>((r) => server.listen(0, r));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 });
@@ -123,5 +124,29 @@ describe('groups and the hash-chained ledger', () => {
     const res = await fetch(base + '/');
     expect(res.status).toBe(200);
     expect(await res.text()).toContain('API is running');
+  });
+});
+
+describe('one-click guest trial', () => {
+  it('creates a working account with no number, can own a group, and can be claimed later', async () => {
+    const g = phone();
+    const r = await g('POST', '/api/auth/guest', { name: 'अतिथि दीदी' });
+    expect(r.status).toBe(201);
+    expect(r.json.user).toMatchObject({ name: 'अतिथि दीदी', guest: true, phone: '' });
+    const demo = await buildDemoData();
+    expect((await g('POST', '/api/groups', { name: 'Trial', village: '', members: demo.group.members, entries: demo.ledger })).status).toBe(201);
+    expect((await g('POST', '/api/auth/claim', { phone: '9876500099', name: 'Sunita', pin: '9999' })).json.user).toMatchObject({ guest: false, phone: '9876500099' });
+    expect((await g('GET', '/api/groups')).json.groups).toHaveLength(1);
+    // The claimed account now logs in like any other.
+    expect((await phone()('POST', '/api/auth/login', { phone: '9876500099', pin: '9999' })).status).toBe(200);
+  });
+
+  it('sweeps guest accounts older than three days, with their groups', async () => {
+    const g = phone();
+    await g('POST', '/api/auth/guest', {});
+    const demo = await buildDemoData();
+    await g('POST', '/api/groups', { name: 'Old trial', village: '', members: demo.group.members, entries: demo.ledger });
+    expect(sweepGuests(db, Date.now() + 4 * 86400_000)).toBeGreaterThanOrEqual(1);
+    expect((await g('GET', '/api/me')).status).toBe(401);
   });
 });

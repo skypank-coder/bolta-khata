@@ -14,6 +14,8 @@ import type { DB } from './db.ts';
  *   POST /api/auth/login    {phone, pin}
  *   POST /api/auth/logout
  *   GET  /api/me
+ *   POST /api/auth/guest  {name}         one-click trial account (expires after 3 days)
+ *   POST /api/auth/claim  {phone, name, pin}   turn a guest account into a real one, keeping its groups
  *   GET  /api/groups                      every group this person owns or follows, with live figures
  *   POST /api/groups        {name, village, members, entries}
  *   GET  /api/groups/:id                  members + the full hash-chained ledger
@@ -152,6 +154,22 @@ function tx<T>(db: DB, fn: () => T): T {
 }
 
 const limiter = new LoginLimiter();
+/** Guest trials per address per hour, so one-click accounts cannot be farmed. */
+const guestLimiter = new LoginLimiter(30, 60 * 60 * 1000);
+const GUEST_DAYS = 3;
+const isGuest = (u: User) => u.phone.startsWith('guest:');
+const publicUser = (u: User) => ({ id: u.id, name: u.name, phone: isGuest(u) ? '' : u.phone, guest: isGuest(u) });
+
+/** Remove trial accounts older than three days, with their groups. */
+export function sweepGuests(db: DB, now = Date.now()) {
+  const cutoff = new Date(now - GUEST_DAYS * 86400_000).toISOString();
+  const old = db.prepare("SELECT id FROM users WHERE phone LIKE 'guest:%' AND created_at < ?").all(cutoff) as { id: string }[];
+  for (const { id } of old) {
+    db.prepare('DELETE FROM groups WHERE owner_id = ?').run(id);
+    db.prepare('DELETE FROM users WHERE id = ?').run(id);
+  }
+  return old.length;
+}
 
 type Handler = (c: Ctx) => Promise<void> | void;
 const routes: Array<[string, RegExp, Handler]> = [
@@ -167,7 +185,7 @@ const routes: Array<[string, RegExp, Handler]> = [
     const id = newId('u');
     db.prepare('INSERT INTO users (id, phone, name, pin_hash, created_at) VALUES (?, ?, ?, ?, ?)')
       .run(id, phone, name, await hashPin(body.pin), new Date().toISOString());
-    send(res, 201, { user: { id, phone, name } }, { 'Set-Cookie': startSession(db, id) });
+    send(res, 201, { user: publicUser({ id, phone, name }) }, { 'Set-Cookie': startSession(db, id) });
   }],
 
   ['POST', /^\/api\/auth\/login$/, async ({ db, req, res, body }) => {
@@ -182,7 +200,7 @@ const routes: Array<[string, RegExp, Handler]> = [
       throw new HttpError(401, 'wrong_pin');
     }
     limiter.clear(key);
-    send(res, 200, { user: { id: row.id, phone: row.phone, name: row.name } }, { 'Set-Cookie': startSession(db, row.id) });
+    send(res, 200, { user: publicUser(row) }, { 'Set-Cookie': startSession(db, row.id) });
   }],
 
   ['POST', /^\/api\/auth\/logout$/, ({ db, req, res }) => {
@@ -191,7 +209,33 @@ const routes: Array<[string, RegExp, Handler]> = [
     send(res, 200, { ok: true }, { 'Set-Cookie': sessionCookie('', 0) });
   }],
 
-  ['GET', /^\/api\/me$/, (c) => send(c.res, 200, { user: needUser(c) })],
+  ['GET', /^\/api\/me$/, (c) => send(c.res, 200, { user: publicUser(needUser(c)) })],
+
+  ['POST', /^\/api\/auth\/guest$/, async ({ db, req, res, body }) => {
+    const ip = req.socket.remoteAddress ?? '';
+    if (guestLimiter.blocked(ip)) throw new HttpError(429, 'too_many_tries');
+    guestLimiter.fail(ip);
+    const name = typeof body.name === 'string' && body.name.trim() ? body.name.trim().slice(0, 40) : 'Guest';
+    const id = newId('u');
+    const phone = `guest:${newToken().slice(0, 16)}`;
+    // A random PIN nobody knows: a guest can only come back through this browser's session.
+    db.prepare('INSERT INTO users (id, phone, name, pin_hash, created_at) VALUES (?, ?, ?, ?, ?)')
+      .run(id, phone, name, await hashPin(newToken()), new Date().toISOString());
+    send(res, 201, { user: publicUser({ id, phone, name }) }, { 'Set-Cookie': startSession(db, id) });
+  }],
+
+  ['POST', /^\/api\/auth\/claim$/, async (c) => {
+    const user = needUser(c);
+    if (!isGuest(user)) throw new HttpError(400, 'not_guest');
+    const phone = normalisePhone(c.body.phone);
+    const name = typeof c.body.name === 'string' ? c.body.name.trim().slice(0, 80) : '';
+    if (!phone) throw new HttpError(400, 'bad_phone');
+    if (!name) throw new HttpError(400, 'bad_name');
+    if (!validPin(c.body.pin)) throw new HttpError(400, 'bad_pin');
+    if (c.db.prepare('SELECT 1 FROM users WHERE phone = ?').get(phone)) throw new HttpError(409, 'phone_taken');
+    c.db.prepare('UPDATE users SET phone = ?, name = ?, pin_hash = ? WHERE id = ?').run(phone, name, await hashPin(c.body.pin), user.id);
+    send(c.res, 200, { user: publicUser({ id: user.id, phone, name }) });
+  }],
 
   ['GET', /^\/api\/groups$/, async (c) => {
     const user = needUser(c);
