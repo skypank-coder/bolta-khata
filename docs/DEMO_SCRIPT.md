@@ -1,10 +1,10 @@
 # 3-minute demo video script
 
-Record the screen in Chrome at http://localhost:3000 (after `docker compose up --build`) with the mic on and the speakers audible, so the replies can be heard. Before recording, open the menu (top right) and press **Restart the demo group**.
+Record the screen in Chrome **on a laptop** (so the member circle shows beside the register) at http://localhost:3000 (after `docker compose up --build`) with the mic on and the speakers audible, so the replies can be heard. Before recording, open the menu (top right) and press **Restart the demo group**.
 
 | Time | Show | Say into the app (Hindi) |
 |---|---|---|
-| 0:00–0:20 | Title and problem, over the app's start screen | (voice-over) "9 crore women in Self-Help Groups. One woman writes the register; the rest have to trust her. Bolta Khata runs the meeting by voice, so the whole group hears every entry." |
+| 0:00–0:20 | Title and problem, over the welcome screen (choose हिंदी) | (voice-over) "9 crore women in Self-Help Groups. One woman writes the register; the rest have to trust her. Bolta Khata runs the meeting by voice, so the whole group hears every entry." |
 | 0:20–0:35 | Tap the mic once (hands-free stays on) | "मीटिंग शुरू करो" |
 | 0:35–0:55 | Attendance; members light up | "मैं मीना हूँ" · "राधा हाज़िर" · "सुनीता" (app asks which Sunita) · "यादव" · "हाज़िरी पूरी" |
 | 0:55–1:25 | Entry, read-back, stamp | "मैं मीना, सौ रुपये बचत, पाँच सौ किस्त"... wait for the read-back... "सही है" |

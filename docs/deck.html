@@ -24,6 +24,8 @@
   p, li { font-size: 25px; line-height: 1.5; margin: 0; }
   ul, ol { margin: 0; padding-left: 28px; }
   li + li { margin-top: 10px; }
+  .dense li { font-size: 22px; line-height: 1.42; }
+  .dense li + li { margin-top: 7px; }
   .lead { font-size: 30px; line-height: 1.45; max-width: 960px; }
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
   .big { font-family: 'Yatra One', sans-serif; font-size: 64px; line-height: 1; color: var(--bahi); }
@@ -98,7 +100,7 @@
   </ul>
 </section>
 
-<section class="slide">
+<section class="slide dense">
   <span class="num">4</span>
   <h2>What is built and working today</h2>
   <div class="cols">
@@ -106,7 +108,8 @@
       <li>Hindi, Marathi and English, in Devanagari or Roman, mixed in one sentence.</li>
       <li>Money as villages say it: dedh hazaar, dhai sau, saade teen hazaar, paune do hazaar, pachchis, paachshe.</li>
       <li>Indian name matching: Sunita, Suneeta, Sunitha and सुनीता reach the same member. Two Sunitas? It asks which.</li>
-      <li>Guards: no repayment without a loan, an overpaid loan is closed and the rest saved, large amounts confirmed twice, loans checked against group cash.</li>
+      <li>Members sit in a circle on screen, as on the durrie; a real group is set up by voice: "naya sadasya jodo: Pushpa Devi".</li>
+      <li>Guards: an overpaid loan is closed and the rest saved, large amounts confirmed twice, loans checked against group cash.</li>
     </ul>
     <ul>
       <li>Tamper-evident ledger: each entry is locked to the previous one with SHA-256. A quiet edit turns the ledger red at that entry.</li>
@@ -114,7 +117,7 @@
       <li>Bank report (PDF), CSV, receipts read aloud or sent on WhatsApp.</li>
       <li>Works offline as an installable app. Data stays on the phone.</li>
       <li>Cash box counted by voice; any shortfall is announced and locked in.</li>
-      <li>124 tests, including 91,000 spoken amounts and 300 random noisy meetings.</li>
+      <li>134 tests: 91,000 spoken amounts, 600 random noisy meetings; 8 bugs found and fixed.</li>
     </ul>
   </div>
 </section>

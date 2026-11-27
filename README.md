@@ -8,13 +8,15 @@
 *Now every one of them can hear it.*
 
 ![Voice-first](https://img.shields.io/badge/voice--first-Hindi%20%C2%B7%20Marathi%20%C2%B7%20English-9E1B1F?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-124%20passing-1C7A48?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-134%20passing-1C7A48?style=for-the-badge)
 ![Keys needed](https://img.shields.io/badge/API%20keys-none-1D2766?style=for-the-badge)
 ![Offline](https://img.shields.io/badge/works-offline-E0A100?style=for-the-badge)
 
 **India Runs on Voice** hackathon (Scaler × Wispr Flow) · Theme: *Livelihoods and small business*
 
 </div>
+
+<p align="center"><img src="docs/screens/sabha.jpg" width="900" alt="The meeting screen on a laptop: the closing summary on a ruled register page with stitched binding, and the members seated in a circle around a durrie, with today's deposits and loans as coins on their seats and the group's cash in the middle"></p>
 
 <table>
 <tr>
@@ -42,7 +44,11 @@ Open **http://localhost:3000** in Chrome. Then either:
 - 🎙️ **tap the mic** and say *"मीटिंग शुरू करो"*, or
 - ▶️ press **"पूरी डेमो मीटिंग चलाइए"** (*Play a full demo meeting*) and watch a whole meeting run itself, by voice, with no mic needed.
 
-No keys. No `.env`. No sign-up. No server. Switch to **मराठी** or **English** from the ☰ menu.
+The first screen asks for a language (**हिंदी · मराठी · English**), explains the idea in three lines, and offers the demo or your own meeting. On a laptop, **Space** talks and **Esc** stops.
+
+No keys. No `.env`. No sign-up. No server.
+
+**Your own group:** ☰ menu → *अपना समूह शुरू करें* (Start your own group): type the group name and the cash carried over, then add members by voice: *"नया सदस्य जोड़ो: पुष्पा देवी"*.
 
 <details>
 <summary>Without Docker</summary>
@@ -137,13 +143,19 @@ Every entry stores the SHA-256 of the entry before it. Press **"छेड़छ�
 ### 💰 6. The cash box is counted by voice
 The step where SHG money really goes missing is the end-of-meeting cash count. Say *"हाथ में 20,100 है"* and it checks against what the khata says the group should hold, announces any shortfall, and **locks the count into the chain**. The bank report shows it.
 
-### 🌳 7. Built for a meeting under a tree
+### 🪔 7. It looks like the meeting it serves
+The members sit in a **circle around a durrie**, the way an SHG actually meets. Present members fill their seat, absent ones stay dashed, the woman whose money is on the table **glows**, today's deposits and loans appear as **coins on her seat**, and the group's cash sits in the middle. The register has a **stitched cloth binding**, lines are **written in like ink**, a new meeting **turns a fresh page**, and the green *सही* stamp lands with a **thump**.
+
+### 👥 8. A real group, set up by voice
+Start your own group, then *"नया सदस्य जोड़ो: पुष्पा देवी"*. The name is read back and added only on *"सही है"*, duplicates are refused even across scripts (*Suman Sharma* = *सुमन शर्मा*), and every joining is locked into the chain.
+
+### 🌳 9. Built for a meeting under a tree
 - **Hands-free**: tap once; it listens, answers and listens again for the whole meeting.
 - **Offline**: installable PWA; the ledger lives on the phone (IndexedDB). Nothing is sent to any server.
 - **Three languages**, and Hindi/Marathi spoken in Devanagari by the phone's own voice.
 - **Live mic-level ring**, so speakers can see they are being heard.
 
-### 🏦 8. Output a bank will accept
+### 🏦 10. Output a bank will accept
 Meeting report (print / save as PDF), CSV for the federation or bank, and a receipt per member that can be **read aloud in her language** or **sent on WhatsApp**.
 
 ---
@@ -151,18 +163,31 @@ Meeting report (print / save as PDF), CSV for the federation or bank, and a rece
 ## Stress-tested, not demo-tested
 
 ```
- 124 tests · all passing
+ 134 tests · all passing
  ├─ 91,000  spoken Hindi amounts (10 → 99,999) parsed back exactly
  ├─  2,000  random amounts × 3 formats (₹, rs, Indian digit grouping)
- ├─    300  seeded random meetings × 45 noisy utterances each
- │          (Hinglish, Devanagari, half-sentences, silence, gibberish)
+ ├─    600  seeded random meetings × 45 noisy utterances each
+ │          (Hinglish, Devanagari, half-sentences, silence, gibberish,
+ │           new members, cash counts, "which Sunita?")
  │          invariants: hash chain valid · cash never negative ·
- │          loans never below zero · no money written without a "yes"
+ │          loans never below zero · no money written without a "yes" ·
+ │          no member ever added twice
  ├─      3  full demo meetings (Hindi, Marathi, English) through the real engine
  └─     ...  every example sentence shown on screen, in every language
 ```
 
-The stress tests found real bugs that are now fixed and guarded: *tees* (30) was being read as 23, *पचहत्तर* (75) was missed, an overpaid loan could go below zero, and an unanswered loan approval could freeze the meeting. A table check now fails the build if any spoken word ever maps to two numbers.
+The stress tests found **eight real bugs**, all fixed and now guarded by tests:
+
+| Found by the stress test | Fix |
+|---|---|
+| *tees* (30) was saved as ₹23 | Number table cleaned; a test fails if any spoken word ever maps to two numbers |
+| *पचहत्तर* (75) was not understood | Schwa deletion before another schwa |
+| An overpaid loan went below zero | Loan closes, the extra goes to her savings |
+| No answer to "मंज़ूर?" froze the meeting | An unapproved loan lapses when the group moves on |
+| "Which Sunita?" could ask forever | Stops asking when the group moves on |
+| After "naya sadasya", *"Rekha 500 bachat"* became a member | Only a real name is accepted |
+| *Suman Sharma* and *सुमन शर्मा* became two members | Duplicates are matched across scripts |
+| Two quick taps could overwrite each other's entry | Conversation turns are queued |
 
 ---
 
@@ -205,6 +230,13 @@ The heart is `step(state, heard, ledger) → (state, reply, entries)`: a pure fu
 | Browser speech recognition (Chrome / Android) | Speech → text | Free today, needs internet. The engine only needs text, so an on-device model or an Indian speech API (Bhashini, Sarvam) can be dropped in behind `listen()`. Typing and buttons always work offline. |
 | Browser speech synthesis | Speaking replies | Free, on-device. Missing a Marathi voice? Falls back to Hindi and still shows the text. |
 | **Nothing else** | | **No paid AI model, no server, no database.** ₹0 per meeting. |
+
+## Accessibility
+
+- Every spoken question has a big button; every reply is spoken **and** shown in large text.
+- Text meets WCAG AA contrast on the ledger paper; tap targets are at least 44px.
+- Full keyboard use with visible focus; Space to talk, Esc to stop.
+- `prefers-reduced-motion` turns off the page turn, ink and stamp animations.
 
 ## Roadmap for the finale
 
