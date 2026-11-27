@@ -33,6 +33,7 @@ export function useBoltaKhata() {
   const [level, setLevel] = useState(0);
   const [chain, setChain] = useState<ChainReport>({ ok: true, brokenAt: null, checked: 0 });
   const [stampKey, setStampKey] = useState(0);
+  const [petalKey, setPetalKey] = useState(0);
   const [demoPlaying, setDemoPlaying] = useState(false);
 
   const dataRef = useRef<AppData | null>(null);
@@ -120,6 +121,7 @@ export function useBoltaKhata() {
     const rendered = render(r.reply, next.settings.lang, next.group.members);
     const id = ++exchangeId.current;
     setExchanges((xs) => [...xs.slice(-30), { id, heard: shownAs ?? heard.text, reply: r.reply, rendered }]);
+    if (r.reply.key === 'closed' || r.reply.key === 'memberAdded') setPetalKey((k) => k + 1);
     if (SAVED_KEYS.has(r.reply.key)) {
       cueSaved();
       if (r.reply.key === 'saved' || r.reply.key === 'loanSaved') {
@@ -279,7 +281,7 @@ export function useBoltaKhata() {
   const balances = useMemo(() => (data ? computeBalances(data.ledger) : null), [data]);
 
   return {
-    data, lang, mstate, status, interim, exchanges, error, level, chain, balances, stampKey,
+    data, lang, mstate, status, interim, exchanges, error, level, chain, balances, stampKey, petalKey,
     toggleTalk, say, updateSettings, resetDemo, tamper, undoTamper, stopLoop, playDemo, demoPlaying, startNewGroup,
     lastExchange: exchanges[exchanges.length - 1] ?? null,
   };

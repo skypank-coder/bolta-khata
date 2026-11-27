@@ -4,6 +4,7 @@ import { RegisterPage } from '../components/RegisterPage';
 import { CoachStrip } from '../components/CoachStrip';
 import { SabhaCircle, type Today } from '../components/SabhaCircle';
 import { nextHint } from '../lib/coach';
+import { SpokenText } from '../components/SpokenText';
 import { Understood } from '../components/Understood';
 import { meetingTotals, reversedIds } from '../lib/ledger';
 import { UI } from '../lib/ui';
@@ -53,6 +54,15 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
     }
     return out;
   }, [today, ledger]);
+
+  // The money entry just stamped, so its coins can fly.
+  const flight = useMemo(() => {
+    if (!stampKey) return null;
+    const reversed = reversedIds(ledger);
+    const last = [...today].reverse().find((e) => ['savings', 'repayment', 'loan'].includes(e.type) && !reversed.has(e.id));
+    return last?.memberId ? { key: stampKey, memberId: last.memberId, dir: last.type === 'loan' ? 'out' as const : 'in' as const } : null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stampKey]);
 
   if (!data || !balances) return null;
 
@@ -108,7 +118,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
                     <span className="mr-2 text-bahi/80">{t.heard}:</span>“<Understood text={lastExchange.heard} members={members} />”
                   </p>
                 )}
-                <p className="font-display text-[1.7rem] leading-[44px] text-neel">{lastExchange.rendered.show}</p>
+                <SpokenText key={lastExchange.id} text={lastExchange.rendered.show} className="font-display text-[1.7rem] leading-[44px] text-neel" />
               </>
             ) : (
               <p className="font-display text-[1.7rem] leading-[44px] text-neel">{t.welcome}</p>
@@ -134,7 +144,16 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
           </div>
 
           <div className="px-4 pb-4 pl-16">
-            <CoachStrip hint={nextHint(mstate, members, lang)} label={t.nowSay} disabled={busy} onSay={(ph) => app.say(ph)} />
+            <CoachStrip
+              hint={(() => {
+                const h = nextHint(mstate, members, lang);
+                // When big answer buttons are already showing, the coach only explains.
+                return actions.length ? { ...h, say: [] } : h;
+              })()}
+              label={t.nowSay}
+              disabled={busy}
+              onSay={(ph) => app.say(ph)}
+            />
           </div>
 
           <div className="border-t-2 border-bahi/30">
@@ -161,6 +180,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
           presentLabel={t.present}
           disabled={busy}
           onTap={(m) => app.say(m.name, lang === 'en' ? m.name : m.nameLocal ?? m.name)}
+          flight={flight}
         />
 
         <div className="rounded-xl border-2 border-haldi/70 bg-bahi-dark/40 p-4">

@@ -8,6 +8,7 @@ import { Report } from './screens/Report';
 import { Sabha } from './screens/Sabha';
 import { Welcome } from './components/Welcome';
 import { HelpSheet } from './components/HelpSheet';
+import { Petals } from './components/Petals';
 import type { Milestone } from './lib/coach';
 import { useBoltaKhata } from './useBoltaKhata';
 
@@ -161,6 +162,8 @@ export default function App() {
           onStart={() => { app.updateSettings({ welcomed: true }); setTab('sabha'); }}
         />
       )}
+
+      <Petals trigger={app.petalKey} />
 
       {helpOpen && (
         <HelpSheet

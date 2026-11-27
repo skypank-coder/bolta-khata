@@ -22,10 +22,12 @@ interface Props {
   presentLabel: string;
   disabled: boolean;
   onTap: (m: Member) => void;
+  /** Money just written: coins fly from her seat into the pot ('in') or out to her ('out'). */
+  flight?: { key: number; memberId: string; dir: 'in' | 'out' } | null;
 }
 
 /** The group sitting in a ring on the durrie, the way an SHG meeting actually looks. */
-export function SabhaCircle({ members, lang, present, today, balances, speaker, asked, cashLabel, presentLabel, disabled, onTap }: Props) {
+export function SabhaCircle({ members, lang, present, today, balances, speaker, asked, cashLabel, presentLabel, disabled, onTap, flight }: Props) {
   const n = Math.max(members.length, 1);
   const label = (m: Member) => (lang === 'en' ? m.name : m.nameLocal ?? m.name);
   const firstOf = (m: Member) => label(m).split(' ')[0];
@@ -33,6 +35,11 @@ export function SabhaCircle({ members, lang, present, today, balances, speaker, 
     members.filter((o) => firstOf(o) === firstOf(m)).length > 1 ? `${firstOf(m)} ${label(m).split(' ')[1]?.slice(0, 1) ?? ''}.` : firstOf(m);
   // Ring radius as a % of the box; more members sit a little further out.
   const radius = n > 12 ? 43 : 40;
+  const seat = (i: number) => {
+    const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
+    return { x: 50 + radius * Math.cos(angle), y: 50 + radius * Math.sin(angle) };
+  };
+  const flightSeat = flight ? members.findIndex((m) => m.id === flight.memberId) : -1;
 
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[440px]" role="group" aria-label={presentLabel}>
@@ -45,7 +52,10 @@ export function SabhaCircle({ members, lang, present, today, balances, speaker, 
             'repeating-radial-gradient(circle at center, #9E1B1F 0 14px, #B3262B 14px 18px, #9E1B1F 18px 30px, #E0A100 30px 32px), #9E1B1F',
         }}
       />
-      <div className="absolute inset-[30%] grid place-items-center rounded-full bg-patra text-center shadow-[0_0_0_4px_#E0A100]">
+      <div
+        key={`pot-${flight?.key ?? 0}`}
+        className={`absolute inset-[30%] grid place-items-center rounded-full bg-patra text-center shadow-[0_0_0_4px_#E0A100] ${flight ? 'pot-pulse' : ''}`}
+      >
         <div className="px-2">
           <p className="text-xs leading-tight text-neel-soft sm:text-sm">{cashLabel}</p>
           <p className="font-display text-xl leading-tight text-bahi num sm:text-2xl">{formatRupees(balances.groupCash)}</p>
@@ -53,10 +63,29 @@ export function SabhaCircle({ members, lang, present, today, balances, speaker, 
         </div>
       </div>
 
+      {flight && flightSeat >= 0 && [0, 1, 2].map((k) => {
+        const s = seat(flightSeat);
+        const from = flight.dir === 'in' ? s : { x: 50, y: 50 };
+        const to = flight.dir === 'in' ? { x: 50, y: 50 } : s;
+        return (
+          <span
+            key={`${flight.key}-${k}`}
+            aria-hidden
+            className="coin pointer-events-none absolute z-10 grid h-7 w-7 place-items-center rounded-full font-display text-sm text-bahi-dark shadow-[0_2px_0_#8a6200]"
+            style={{
+              background: 'radial-gradient(circle at 35% 30%, #FFF1B8, #F5C84B 45%, #C98A00)',
+              animationDelay: `${k * 110}ms`,
+              ['--x0' as string]: `${from.x}%`, ['--y0' as string]: `${from.y}%`,
+              ['--x1' as string]: `${to.x}%`, ['--y1' as string]: `${to.y}%`,
+            }}
+          >
+            ₹
+          </span>
+        );
+      })}
+
       {members.map((m, i) => {
-        const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
-        const x = 50 + radius * Math.cos(angle);
-        const y = 50 + radius * Math.sin(angle);
+        const { x, y } = seat(i);
         const here = present.has(m.id);
         const isSpeaker = speaker === m.id;
         const isAsked = asked.includes(m.id);

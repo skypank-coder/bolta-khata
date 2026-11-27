@@ -45,6 +45,28 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 .page-turn { animation: page-turn 650ms cubic-bezier(.2,.8,.25,1) both; }
 
+/* Marigold petals falling, drifting and turning. */
+@keyframes petal-fall {
+  0% { transform: translate3d(0, -5vh, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate3d(var(--drift), 108vh, 0) rotate(var(--spin)); opacity: 0.9; }
+}
+.petal { animation-name: petal-fall; animation-timing-function: cubic-bezier(.3,.1,.5,1); animation-fill-mode: both; }
+
+/* Coins flying between a member's seat and the group pot, in a little arc. */
+@keyframes coin-fly {
+  0% { left: var(--x0); top: var(--y0); transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  15% { opacity: 1; }
+  55% { transform: translate(-50%, -130%) scale(1.2); }
+  100% { left: var(--x1); top: var(--y1); transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+}
+.coin { animation: coin-fly 950ms cubic-bezier(.45,.05,.4,1) both; }
+@keyframes pot-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px #E0A100; }
+  50% { box-shadow: 0 0 0 10px rgba(224, 161, 0, 0.55), 0 0 30px 10px rgba(245, 200, 75, 0.6); }
+}
+.pot-pulse { animation: pot-pulse 700ms ease-out 700ms both; }
+
 @media print {
   body { background: white !important; font-size: 12px; }
   .no-print { display: none !important; }
