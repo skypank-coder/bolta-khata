@@ -275,7 +275,7 @@ Production without Docker: `npm run build && npm start` serves everything on por
 
 ## Built by voice with Wispr Flow
 
-How Wispr Flow was used to build this is described in the Round 2 submission note.
+Every instruction, feature idea and bug report for this build was spoken to an AI coding assistant through Wispr Flow, in Hinglish. Sakhi Didi, the clearer voice, the redesigned sign-up form and the stress tests that found nine bugs all started as spoken requests. Speaking everything out loud meant describing the product the way an SHG member experiences it, and switching between Hindi and English mid-sentence, exactly what Bolta Khata has to handle. The full note is in [`docs/SUBMISSION.md`](docs/SUBMISSION.md).
 
 ## Roadmap for the finale
 

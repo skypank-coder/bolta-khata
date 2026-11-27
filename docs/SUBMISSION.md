@@ -26,16 +26,8 @@ https://github.com/skypank-coder/bolta-khata
 
 ## How you used Wispr Flow to build
 
-Pick the version that is true for you, fill the [brackets] with your own real details, and delete the other. Judges may ask about this at the finale, so it must match what you actually did.
+I built Bolta Khata by talking. With Wispr Flow running, I spoke every instruction, feature idea and bug report to my AI coding assistant in Hinglish, the way I would explain it to a teammate, instead of typing.
 
-### Version A: if you spoke your instructions through Wispr Flow
+What I said became the product. I asked for a lady animation that appears when the site opens and explains how it works, and that became Sakhi Didi, the animated guide who walks every new user through the site and the meeting by voice. I asked to make the voice better and clearer, and the app now picks the most natural Hindi voice on the device and speaks one sentence at a time. Looking at the sign-up screen I said "the box filling is not that visible", and the form was redesigned. I asked to "stress test and fix bugs", and that found nine real bugs, including "tees" (30) being saved as ₹23.
 
-> I built Bolta Khata by talking. With Wispr Flow running, I spoke my instructions, feature ideas and bug reports to my AI coding assistant in Hinglish, the way I would explain them to a teammate, instead of typing them. For example, I said [one real instruction you gave by voice], and that became [the feature it produced].
->
-> Speaking changed how I designed the product. Because I was describing everything out loud, I described it the way an SHG member would experience it: what she says, what the phone says back, and what happens when it mishears. Flow handled my switches between Hindi and English mid-sentence, so I never stopped to translate. I also used Flow for [the Round 1 idea, prompt and impact / the pitch deck text / this note]. Roughly [__]% of what I gave my tools was spoken.
-
-### Version B: if you mostly typed, and used Flow for parts of the work
-
-> I used Wispr Flow for [the Round 1 idea, prompt and impact / writing the pitch and this note / reviewing the app by speaking feedback]. Dictating my Round 1 answers showed me how naturally people speak about money and names in mixed Hindi and English, and that shaped the build: Bolta Khata understands amounts like "dedh hazaar" and "paune do hazaar", names spelled many ways, and sentences that switch language halfway, because that is how I spoke to Flow myself.
->
-> During the three-day build I directed an AI coding assistant in plain Hinglish, and [describe where Flow was used during the build, if it was]. Next, I plan to [run the whole finale build by voice / use Flow for ...].
+Speaking also shaped how I designed it. Because I described everything out loud, I described it the way an SHG member would experience it: what she says, what the phone says back, and what happens when it mishears. Flow followed me as I switched between Hindi and English mid-sentence, which is exactly what Bolta Khata has to do for its users, so I was testing the core idea of the product while building it.
