@@ -21,6 +21,7 @@ export default defineConfig({
       workbox: { globPatterns: ['**/*.{js,css,html,svg,woff2}'] },
     }),
   ],
-  server: { port: 3000 },
+  // In development the API runs separately (npm run dev:api on 8787); in Docker one server does both.
+  server: { port: 3000, proxy: { '/api': 'http://localhost:8787' } },
   test: { environment: 'node' },
 });
