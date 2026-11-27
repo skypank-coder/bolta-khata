@@ -41,6 +41,7 @@ describe('spoken money', () => {
     ['डेढ़ हज़ार', [1500]],
     ['पाचशे', [500]],
     ['दीड हजार', [1500]],
+    ['शंभर रुपये', [100]],
     ['2k', [2000]],
   ])('%s', (text, expected) => {
     expect(amounts(text)).toEqual(expected);

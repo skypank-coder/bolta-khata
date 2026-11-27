@@ -55,7 +55,7 @@ const ENGLISH_NUMBERS: Vocab = [
 ];
 
 const MULTIPLIERS: Vocab = [
-  [100, ['sau', 'so', 'saw', 'hundred', 'shambhar', 'shembhar']],
+  [100, ['sau', 'so', 'saw', 'hundred', 'shambhar', 'shanbhar', 'shembhar', 'shambar']],
   [1000, ['hazaar', 'hazar', 'hajar', 'hajaar', 'hazzar', 'thousand', 'k']],
   [100000, ['lakh', 'lac', 'laakh', 'lakhs']],
 ];
@@ -164,7 +164,7 @@ export function findAmounts(tokens: string[]): NumberSpan[] {
 
   while (i < tokens.length) {
     const first = classify(tokens[i]);
-    if (!first.some((t) => t.kind === 'num' || t.kind === 'frac' || (t.kind === 'mul' && t.value >= 100 && i > 0))) {
+    if (!first.some((t) => t.kind === 'num' || t.kind === 'frac' || (t.kind === 'mul' && t.value >= 100))) {
       i++;
       continue;
     }

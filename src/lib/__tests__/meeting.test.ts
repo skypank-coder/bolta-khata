@@ -149,3 +149,59 @@ describe('examples shown on screen are understood', async () => {
     }
   }
 });
+
+describe('same meeting in Marathi and in English', () => {
+  it('runs a Marathi meeting in Devanagari', async () => {
+    const m = await meeting();
+    expect((await m.say('मीटिंग सुरू करा')).key).toBe('started');
+    expect(await m.say('मी मीना')).toEqual({ key: 'present', member: 'm01' });
+    expect(await m.say('राधा हजर')).toEqual({ key: 'present', member: 'm06' });
+    expect((await m.say('हजेरी पूर्ण')).key).toBe('attendanceDone');
+    expect(await m.say('मी मीना, शंभर रुपये बचत')).toMatchObject({ key: 'readback', drafts: [{ amount: 100, type: 'savings' }] });
+    expect((await m.say('बरोबर')).key).toBe('saved');
+    expect(await m.say('रेखा हप्ता पाचशे')).toMatchObject({ key: 'readback', drafts: [{ amount: 500, type: 'repayment' }] });
+    expect((await m.say('हो')).key).toBe('saved');
+    expect(await m.say('राधाला दीड हजार कर्ज')).toMatchObject({ key: 'loanAsk', draft: { amount: 1500, memberId: 'm06' } });
+    expect((await m.say('मंजूर')).key).toBe('loanSaved');
+    expect((await m.say('मीटिंग बंद करा')).key).toBe('summary');
+    expect((await m.say('बरोबर')).key).toBe('closed');
+  });
+
+  it('runs an English meeting', async () => {
+    const m = await meeting();
+    expect((await m.say('Start the meeting')).key).toBe('started');
+    expect((await m.say('I am Meena')).key).toBe('present');
+    expect((await m.say('Attendance done')).key).toBe('attendanceDone');
+    expect(await m.say('Meena, five hundred rupees savings')).toMatchObject({ key: 'readback', drafts: [{ amount: 500 }] });
+    expect((await m.say('yes')).key).toBe('saved');
+    expect((await m.say('Undo')).key).toBe('undone');
+    expect((await m.say('End the meeting')).key).toBe('summary');
+    expect((await m.say('no')).key).toBe('stillOpen');
+  });
+
+  it('a repeated question gets the same answer', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    const first = await m.say('Geeta 200 bachat');
+    expect(await m.say('phir se bolo')).toEqual(first);
+  });
+
+  it('a large amount is read back twice', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    expect(await m.say('Meena 12000 bachat')).toMatchObject({ key: 'readback', warn: 'large', stage: 1 });
+    expect(await m.say('haan')).toMatchObject({ key: 'readback', stage: 2 });
+    expect((await m.say('haan')).key).toBe('saved');
+  });
+
+  it('cancelling a loan puts the cash back', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    const before = computeBalances(m.ledger).groupCash;
+    await m.say('Anjali ko 1000 loan');
+    await m.say('manzoor');
+    expect(computeBalances(m.ledger).groupCash).toBe(before - 1000);
+    await m.say('pichli entry hatao');
+    expect(computeBalances(m.ledger).groupCash).toBe(before);
+  });
+});
