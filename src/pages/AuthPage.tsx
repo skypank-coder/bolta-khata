@@ -29,7 +29,7 @@ export function AuthPage({ mode, go, onSignedIn }: { mode: 'login' | 'signup'; g
     }
   };
 
-  const field = 'min-h-[52px] w-full rounded-lg bg-patra px-4 text-xl text-neel ring-2 ring-transparent focus:ring-haldi';
+  const field = 'field';
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   return (
@@ -50,14 +50,14 @@ export function AuthPage({ mode, go, onSignedIn }: { mode: 'login' | 'signup'; g
             <label className="block">
               <span className="mb-1 block font-semibold text-neel">{a.phone}</span>
               <span className="flex items-center gap-2">
-                <span className="rounded-lg bg-patra-deep px-3 py-3 text-xl text-neel-soft">+91</span>
-                <input className={field} type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={14} required value={form.phone} onChange={set('phone')} />
+                <span className="grid min-h-[52px] place-items-center rounded-lg bg-neel px-3 text-xl font-semibold text-patra">+91</span>
+                <input className={field} type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={14} required placeholder="98765 43210" value={form.phone} onChange={set('phone')} />
               </span>
             </label>
             {signup && (
               <label className="block">
                 <span className="mb-1 block font-semibold text-neel">{a.name}</span>
-                <input className={field} type="text" autoComplete="name" required value={form.name} onChange={set('name')} />
+                <input className={field} type="text" autoComplete="name" required placeholder={lang === 'en' ? 'e.g. Meena Devi' : 'जैसे: मीना देवी'} value={form.name} onChange={set('name')} />
               </label>
             )}
             <label className="block">
@@ -70,6 +70,7 @@ export function AuthPage({ mode, go, onSignedIn }: { mode: 'login' | 'signup'; g
                 pattern="\d{4,6}"
                 maxLength={6}
                 required
+                placeholder="••••"
                 value={form.pin}
                 onChange={(e) => setForm((f) => ({ ...f, pin: e.target.value.replace(/\D/g, '') }))}
               />

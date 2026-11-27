@@ -12,13 +12,27 @@ button { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 3px solid #F5C84B; outline-offset: 3px; border-radius: 6px; }
 
 @layer components {
-  /* A page of the register: yellow paper, blue ruling, red margin line. */
+  /* A page of the register: yellow paper and the red margin line. */
   .ledger-paper {
     background-color: #FAEFC4;
-    background-image:
-      linear-gradient(90deg, transparent 52px, rgba(158, 27, 31, 0.45) 52px, rgba(158, 27, 31, 0.45) 54px, transparent 54px),
-      repeating-linear-gradient(180deg, transparent 0, transparent 43px, rgba(29, 39, 102, 0.16) 43px, rgba(29, 39, 102, 0.16) 44px);
+    background-image: linear-gradient(90deg, transparent 52px, rgba(158, 27, 31, 0.45) 52px, rgba(158, 27, 31, 0.45) 54px, transparent 54px);
   }
+  /* Blue ruling, used only where every row is exactly one 44px line, so writing sits on the line. */
+  .ruled {
+    background-image: repeating-linear-gradient(180deg, transparent 0, transparent 43px, rgba(29, 39, 102, 0.18) 43px, rgba(29, 39, 102, 0.18) 44px);
+  }
+  /* Form fields that are easy to find on paper: white, bordered, a strong focus ring. */
+  .field {
+    min-height: 52px; width: 100%; border-radius: 0.6rem; padding: 0 1rem;
+    background: #FFFDF6; color: #1D2766; font-size: 1.25rem;
+    border: 2px solid rgba(29, 39, 102, 0.35);
+    box-shadow: inset 0 2px 3px rgba(29, 39, 102, 0.08);
+    transition: border-color 120ms, box-shadow 120ms;
+  }
+  .field::placeholder { color: #5A6299; opacity: 0.8; }
+  .field:hover { border-color: rgba(29, 39, 102, 0.55); }
+  .field:focus { outline: none; border-color: #9E1B1F; box-shadow: 0 0 0 4px rgba(224, 161, 0, 0.55), inset 0 2px 3px rgba(29, 39, 102, 0.08); }
+  .field[aria-invalid="true"] { border-color: #9E1B1F; background: #FFF4F2; }
   /* Cloth binding with white stitches down the spine of the register. */
   .bound { position: relative; }
   .bound::before {
