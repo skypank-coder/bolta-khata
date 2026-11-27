@@ -112,3 +112,11 @@ export async function buildDemoData(lang: Lang = 'hi'): Promise<AppData> {
   const ledger = await appendEntries([], drafts, () => new Date('2026-11-20T10:00:00+05:30'));
   return { group: DEMO_GROUP, ledger, settings: { lang, handsFree: true } };
 }
+
+/** A real group of your own: a name, a village, the cash carried over, and no members yet (add them by voice). */
+export async function buildNewGroup(name: string, village: string, openingCash: number, settings: Settings): Promise<AppData> {
+  const ledger = await appendEntries([], [
+    { type: 'opening', memberId: null, amount: Math.max(0, Math.round(openingCash)), meetingId: 'history', note: 'Opening cash' },
+  ]);
+  return { group: { name, nameLocal: name, village, members: [] }, ledger, settings };
+}

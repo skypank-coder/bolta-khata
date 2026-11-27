@@ -15,6 +15,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('sabha');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [voiceOk, setVoiceOk] = useState(true);
+  const [newGroup, setNewGroup] = useState({ name: '', village: '', cash: '' });
   const { data, lang } = app;
   const t = UI[lang];
 
@@ -96,6 +97,37 @@ export default function App() {
                 </div>
                 {!voiceOk && <p className="mt-2 text-sm text-haldi-light">{t.settings.voiceMissing}</p>}
               </fieldset>
+              <form
+                className="space-y-2 rounded-lg p-3 ring-1 ring-patra/25"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!newGroup.name.trim() || !window.confirm(t.settings.newGroupConfirm)) return;
+                  void app.startNewGroup(newGroup.name.trim(), newGroup.village.trim(), Number(newGroup.cash) || 0);
+                  setNewGroup({ name: '', village: '', cash: '' });
+                  setSettingsOpen(false);
+                  setTab('sabha');
+                }}
+              >
+                <p className="font-semibold">{t.settings.newGroup}</p>
+                <p className="text-sm text-patra/80">{t.settings.newGroupHint}</p>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {([['name', t.settings.groupName, 'text'], ['village', t.settings.village, 'text'], ['cash', t.settings.openingCash, 'number']] as const).map(([k, label, type]) => (
+                    <label key={k} className="flex flex-col gap-1 text-sm">
+                      {label}
+                      <input
+                        type={type}
+                        inputMode={type === 'number' ? 'numeric' : undefined}
+                        min={0}
+                        required={k === 'name'}
+                        value={newGroup[k]}
+                        onChange={(e) => setNewGroup((g) => ({ ...g, [k]: e.target.value }))}
+                        className="min-h-[44px] rounded-lg bg-patra px-3 text-base text-neel"
+                      />
+                    </label>
+                  ))}
+                </div>
+                <button type="submit" className="min-h-[44px] rounded-lg bg-haldi px-4 font-semibold text-bahi-dark">{t.settings.create}</button>
+              </form>
               <p className="text-sm text-patra/80">{t.settings.privacy}</p>
               <button
                 type="button"

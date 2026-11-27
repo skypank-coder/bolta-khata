@@ -6,7 +6,7 @@ import {
   cueError, cueListen, cueSaved, listen, micLevel, speak, stopSpeaking, sttSupported,
   type Heard, type ListenError, type ListenHandle,
 } from './lib/speech';
-import { buildDemoData, loadData, saveData, type AppData, type Lang } from './lib/store';
+import { buildDemoData, buildNewGroup, loadData, saveData, type AppData, type Lang } from './lib/store';
 
 export type Status = 'idle' | 'listening' | 'thinking' | 'speaking';
 
@@ -93,10 +93,13 @@ export function useBoltaKhata() {
       stateRef.current = r.state;
       setMstate(r.state);
       let next = current;
-      if (r.drafts.length) {
-        next = { ...current, ledger: await appendEntries(current.ledger, r.drafts) };
-        commitData(next);
+      if (r.newMember) {
+        next = { ...next, group: { ...next.group, members: [...next.group.members, r.newMember] } };
       }
+      if (r.drafts.length) {
+        next = { ...next, ledger: await appendEntries(next.ledger, r.drafts) };
+      }
+      if (next !== current) commitData(next);
       return { r, next };
     });
     queueRef.current = run.catch(() => undefined);
@@ -201,6 +204,17 @@ export function useBoltaKhata() {
     commitData(fresh);
   }, [commitData, stopLoop]);
 
+  /** Start a real group of your own; members are then added by voice. */
+  const startNewGroup = useCallback(async (name: string, village: string, openingCash: number) => {
+    stopLoop();
+    const settings = dataRef.current?.settings ?? { lang: 'hi' as Lang, handsFree: true };
+    const fresh = await buildNewGroup(name, village, openingCash, settings);
+    stateRef.current = initialState;
+    setMstate(initialState);
+    setExchanges([]);
+    commitData(fresh);
+  }, [commitData, stopLoop]);
+
   /** Show what happens if someone quietly changes an old amount in the khata. */
   const tamper = useCallback((index: number) => {
     const d = dataRef.current;
@@ -258,7 +272,7 @@ export function useBoltaKhata() {
 
   return {
     data, lang, mstate, status, interim, exchanges, error, level, chain, balances, stampKey,
-    toggleTalk, say, updateSettings, resetDemo, tamper, undoTamper, stopLoop, playDemo, demoPlaying,
+    toggleTalk, say, updateSettings, resetDemo, tamper, undoTamper, stopLoop, playDemo, demoPlaying, startNewGroup,
     lastExchange: exchanges[exchanges.length - 1] ?? null,
   };
 }
