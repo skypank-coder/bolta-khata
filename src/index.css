@@ -81,6 +81,16 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 .pot-pulse { animation: pot-pulse 700ms ease-out 700ms both; }
 
+/* Sakhi Didi: breathing, blinking, waving, talking. */
+.sakhi-body { animation: sakhi-breathe 3.2s ease-in-out infinite; transform-origin: 80px 200px; }
+.sakhi-eyes { animation: sakhi-blink 4.6s infinite; transform-box: fill-box; transform-origin: center; }
+.sakhi-wave { animation: sakhi-wave 0.9s ease-in-out 3; }
+.sakhi-mouth { animation: sakhi-talk 0.22s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes sakhi-breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+@keyframes sakhi-blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+@keyframes sakhi-wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-16deg); } }
+@keyframes sakhi-talk { from { transform: scaleY(0.35); } to { transform: scaleY(1.15); } }
+
 @media print {
   body { background: white !important; font-size: 12px; }
   .no-print { display: none !important; }

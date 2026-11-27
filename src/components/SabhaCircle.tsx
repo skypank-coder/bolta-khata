@@ -42,7 +42,7 @@ export function SabhaCircle({ members, lang, present, today, balances, speaker, 
   const flightSeat = flight ? members.findIndex((m) => m.id === flight.memberId) : -1;
 
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[440px]" role="group" aria-label={presentLabel}>
+    <div className="relative mx-auto aspect-square w-full max-w-[440px]" role="group" aria-label={presentLabel} data-tour="circle">
       {/* The durrie */}
       <div
         aria-hidden

@@ -106,7 +106,7 @@ export function Sabha({ app, onHelp }: { app: App; onHelp: () => void }) {
             </span>
           </div>
 
-          <div className="min-h-[176px] py-4 pl-16 pr-5" aria-live="polite">
+          <div className="min-h-[176px] py-4 pl-16 pr-5" aria-live="polite" data-tour="reply">
             {listeningText !== null ? (
               <p className="font-display text-[1.7rem] leading-[44px] text-neel-soft">
                 <Understood text={listeningText} members={members} />

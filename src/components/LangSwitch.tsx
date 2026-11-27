@@ -8,7 +8,7 @@ const FULL: Record<Lang, string> = { hi: 'हिंदी', mr: 'मराठी
 export function LangSwitch() {
   const [lang, setLang] = useDeviceLang();
   return (
-    <div className="flex rounded-lg bg-bahi-dark/50 p-1 ring-1 ring-patra/25" role="radiogroup" aria-label="Language / भाषा">
+    <div className="flex rounded-lg bg-bahi-dark/50 p-1 ring-1 ring-patra/25" role="radiogroup" aria-label="Language / भाषा" data-tour="lang">
       {(Object.keys(SHORT) as Lang[]).map((l) => (
         <button
           key={l}

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { MILESTONES, MILESTONE_TEXT, type Milestone } from '../lib/coach';
 import { SPEECH_LANG } from '../lib/phrases';
 import { speak } from '../lib/speech';
+import { Sakhi } from './Sakhi';
 import type { Lang } from '../lib/store';
 
 type Card = { icon: string; title: string; text: string; tryIt?: string };
@@ -63,10 +64,11 @@ interface Props {
   onClose: () => void;
   onTry: (phrase: string) => void;
   onDemo: () => void;
+  onTour: () => void;
 }
 
 /** Picture cards that read themselves aloud, and a ladder of what this group has already done. */
-export function HelpSheet({ lang, learned, onClose, onTry, onDemo }: Props) {
+export function HelpSheet({ lang, learned, onClose, onTry, onDemo, onTour }: Props) {
   const c = CARDS[lang];
   const closeRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -141,8 +143,16 @@ export function HelpSheet({ lang, learned, onClose, onTry, onDemo }: Props) {
 
         <button
           type="button"
+          onClick={onTour}
+          className="mt-6 flex min-h-[56px] w-full items-center justify-center gap-2 rounded-lg bg-bahi px-4 font-display text-xl text-patra shadow-[0_4px_0_#4a0a0c] active:translate-y-0.5"
+        >
+          <span className="block h-11 w-11 overflow-hidden rounded-full bg-haldi/40"><Sakhi talking={false} size={44} /></span>
+          {lang === 'en' ? 'Let Sakhi show you around' : lang === 'mr' ? 'सखी तुम्हाला सगळं दाखवेल' : 'सखी से पूरा टूर लीजिए'}
+        </button>
+        <button
+          type="button"
           onClick={onDemo}
-          className="mt-6 min-h-[52px] w-full rounded-lg bg-haldi px-4 font-display text-xl text-bahi-dark shadow-[0_4px_0_#8a6200] active:translate-y-0.5"
+          className="mt-3 min-h-[52px] w-full rounded-lg bg-haldi px-4 font-display text-xl text-bahi-dark shadow-[0_4px_0_#8a6200] active:translate-y-0.5"
         >
           ▶ {c.demo}
         </button>

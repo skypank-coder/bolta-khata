@@ -10,6 +10,8 @@ import { Welcome } from './components/Welcome';
 import { HelpSheet } from './components/HelpSheet';
 import { Petals } from './components/Petals';
 import { VoiceSettings } from './components/VoiceSettings';
+import { SakhiButton, Tour } from './components/Tour';
+import { MEETING_TOUR, markTourSeen, tourSeen } from './lib/tours';
 import type { Milestone } from './lib/coach';
 import { useBoltaKhata, type KhataOptions, type SyncStatus } from './useBoltaKhata';
 
@@ -28,9 +30,10 @@ const G_TEXT: Record<Lang, { back: string; demoBadge: string; viewer: string; sh
   en: { back: 'All groups', demoBadge: 'Demo', viewer: 'You can view this group only. Entries are made on the group\'s own phone.', share: 'Code to follow this group', shareHint: 'An NGO worker or bank officer can follow the group with this code, read-only.', copy: 'Copy', copied: 'Copied', notFound: 'This group was not found, or is not in your account.', conflict: 'Another phone had newer entries. The online ledger was kept.' },
 };
 
-export default function GroupApp({ options, onExit }: { options?: KhataOptions; onExit?: () => void }) {
+export default function GroupApp({ options, onExit, startTour = false }: { options?: KhataOptions; onExit?: () => void; startTour?: boolean }) {
   const app = useBoltaKhata(options);
   const [copied, setCopied] = useState(false);
+  const [touring, setTouring] = useState(false);
   const [tab, setTab] = useState<Tab>('sabha');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -43,6 +46,17 @@ export default function GroupApp({ options, onExit }: { options?: KhataOptions; 
     document.documentElement.lang = lang;
     voiceAvailable(SPEECH_LANG[lang]).then(setVoiceOk);
   }, [lang]);
+
+  // Sakhi shows the meeting screen the first time (or straight after a one-click trial).
+  useEffect(() => {
+    if (!data || app.readOnly) return;
+    const welcomeFirst = app.isDemo && !data.settings.welcomed;
+    if ((startTour || !tourSeen('meeting')) && !welcomeFirst) {
+      const t = setTimeout(() => setTouring(true), 700);
+      return () => clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!data, data?.settings.welcomed, startTour]);
 
   // Leaving the meeting screen stops the microphone.
   useEffect(() => {
@@ -91,11 +105,16 @@ export default function GroupApp({ options, onExit }: { options?: KhataOptions; 
             </p>
             <p className="flex items-center gap-1.5 truncate text-sm text-patra/80">
               <span aria-hidden className={`inline-block h-2 w-2 rounded-full ${SYNC_DOT[app.syncStatus]}`} />
-              {SYNC[lang][app.syncStatus]}{data.group.village ? `, ${data.group.village}` : ''}
+              {app.readOnly ? (
+                <span className="flex items-center gap-1 rounded bg-bahi-dark/60 px-1.5 font-semibold text-haldi-light">
+                  <span aria-hidden className="h-2 w-2 animate-pulse rounded-full bg-haldi-light" />LIVE
+                </span>
+              ) : SYNC[lang][app.syncStatus]}{data.group.village ? `, ${data.group.village}` : ''}
             </p>
           </div>
           <button
             type="button"
+            data-tour="help"
             onClick={() => setHelpOpen(true)}
             className="flex h-11 items-center gap-1.5 rounded-lg bg-patra px-3 font-display text-lg text-bahi shadow-[0_3px_0_#4a0a0c]"
           >
@@ -114,7 +133,7 @@ export default function GroupApp({ options, onExit }: { options?: KhataOptions; 
             </svg>
           </button>
         </div>
-        <nav className="mx-auto flex max-w-6xl gap-1 px-4 pt-2" aria-label="Screens">
+        <nav className="mx-auto flex max-w-6xl gap-1 px-4 pt-2" aria-label="Screens" data-tour="tabs">
           {(['sabha', 'khata', 'report'] as Tab[]).map((k) => (
             <button
               key={k}
@@ -224,11 +243,24 @@ export default function GroupApp({ options, onExit }: { options?: KhataOptions; 
           lang={lang}
           onLang={(l) => app.updateSettings({ lang: l })}
           onDemo={() => { app.updateSettings({ welcomed: true }); setTab('sabha'); void app.playDemo(); }}
-          onStart={() => { app.updateSettings({ welcomed: true }); setTab('sabha'); }}
+          onStart={() => { app.updateSettings({ welcomed: true }); setTab('sabha'); setTouring(true); }}
         />
       )}
 
       <Petals trigger={app.petalKey} />
+
+      {touring && (
+        <Tour
+          steps={MEETING_TOUR}
+          lang={lang}
+          onDone={() => { markTourSeen('meeting'); setTouring(false); }}
+        />
+      )}
+      {!touring && tab === 'sabha' && !app.readOnly && (
+        <div className="lg:block hidden">
+          <SakhiButton onClick={() => { app.stopLoop(); setTouring(true); }} label={lang === 'en' ? 'Ask Sakhi' : lang === 'mr' ? 'सखीला विचारा' : 'सखी से पूछिए'} />
+        </div>
+      )}
 
       {helpOpen && (
         <HelpSheet
@@ -236,6 +268,7 @@ export default function GroupApp({ options, onExit }: { options?: KhataOptions; 
           learned={(data.settings.learned ?? []) as Milestone[]}
           onClose={() => setHelpOpen(false)}
           onTry={(ph) => { setHelpOpen(false); setTab('sabha'); void app.say(ph); }}
+          onTour={() => { setHelpOpen(false); setTab('sabha'); setTouring(true); }}
           onDemo={() => {
             setHelpOpen(false);
             if (app.isDemo) { setTab('sabha'); void app.playDemo(); } else window.location.hash = '#/demo';

@@ -10,7 +10,7 @@ interface Props {
 /** "Now say: ..." One line of guidance and the exact words, always visible under the reply. */
 export function CoachStrip({ hint, label, disabled, onSay }: Props) {
   return (
-    <div key={hint.lead} className="animate-pop mt-4 flex gap-3 rounded-xl bg-neel/[0.06] p-3 ring-1 ring-neel/15" aria-live="polite">
+    <div key={hint.lead} data-tour="coach" className="animate-pop mt-4 flex gap-3 rounded-xl bg-neel/[0.06] p-3 ring-1 ring-neel/15" aria-live="polite">
       <span aria-hidden className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-neel text-xl text-patra">
         <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <path d="M4 5h16v10H9l-5 4z" />

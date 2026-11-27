@@ -14,7 +14,7 @@ export function MicButton({ status, level, label, action, onClick }: Props) {
   const active = status !== 'idle';
   const ring = status === 'listening' ? 1 + level * 0.55 : 1;
   return (
-    <div className="relative flex flex-col items-center gap-2">
+    <div className="relative flex flex-col items-center gap-2" data-tour="mic">
       <div className="relative grid h-28 w-28 place-items-center">
         <span
           aria-hidden
