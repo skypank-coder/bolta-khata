@@ -6,13 +6,15 @@
 **Every member speaks her own entry. The phone reads it back to the whole group. Nothing is written until the group says *"sahi hai"*, and after that nobody can quietly change it.**
 
 ![Voice-first](https://img.shields.io/badge/voice--first-Hindi%20%C2%B7%20Marathi%20%C2%B7%20English-9E1B1F?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-157%20passing-1C7A48?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-158%20passing-1C7A48?style=for-the-badge)
 ![API keys](https://img.shields.io/badge/API%20keys-none-1D2766?style=for-the-badge)
 ![Run](https://img.shields.io/badge/docker%20compose%20up-port%203000-E0A100?style=for-the-badge)
 
 *India Runs on Voice* (Scaler × Wispr Flow) · Theme: **Livelihoods and small business**
 
-<img src="docs/screens/sabha.jpg" width="900" alt="The meeting screen on a laptop: the spoken summary written on a stitched register page, and the members seated in a circle around a durrie with today's deposits and loans as coins on their seats and the group's cash in the middle">
+<img src="docs/screens/meeting-en.gif" width="900" alt="Animated: a whole meeting playing by itself in English. Attendance fills the circle of members, two Sunitas are told apart, a savings entry is read back with its words highlighted, a repayment and a loan are approved, coins move in and out of the group pot, and the meeting closes with a summary and marigold petals">
+
+<sub>A whole meeting playing by itself (built-in demo, English). Hindi and Marathi work the same way; the screenshots below are mostly Hindi, the product's first language.</sub>
 
 </div>
 
@@ -98,7 +100,7 @@ The meeting already happens out loud. **Bolta Khata makes the record happen out 
 
 ### Working product (25%)
 - **A full product, not a mock-up:** website, mobile + PIN accounts, a groups dashboard, roles with join codes, offline-first cloud sync, guest trials. All in one container.
-- **157 automated tests**, including whole spoken meetings in three languages, 600 random noisy meetings, and API tests over real HTTP. [Proof below](#proof-it-works-stress-tested-not-demo-tested).
+- **158 automated tests**, including whole spoken meetings in three languages, 600 random noisy meetings, and API tests over real HTTP. [Proof below](#proof-it-works-stress-tested-not-demo-tested).
 - **Works without network:** the ledger lives on the phone (IndexedDB) and syncs when signal returns; installable as an app (PWA).
 - **Every spoken question also has a big button**, for noisy rooms and for judges without a mic.
 
@@ -141,10 +143,15 @@ This exact meeting is the built-in demo, and it runs through the real engine in 
 
 <table>
 <tr>
-<td width="50%"><img src="docs/screens/website.jpg" alt="Website: Hindi headline, a meeting playing live in the hero with highlighted words, one-click trial button"></td>
-<td width="50%"><img src="docs/screens/sakhi-site.jpg" alt="Sakhi Didi spotlights the live meeting on the website and explains it aloud"></td>
+<td width="50%"><img src="docs/screens/website.jpg" alt="Website in Hindi: headline, a meeting playing live in the hero with highlighted words, one-click trial button"></td>
+<td width="50%"><img src="docs/screens/website-en.jpg" alt="The same website in English: The Self-Help Group meeting, run by voice; Try it in one click"></td>
 </tr>
-<tr><td align="center"><b>Website</b>, Hindi first, a meeting playing live</td><td align="center"><b>Sakhi Didi</b> walks through it aloud</td></tr>
+<tr><td align="center"><b>Website in Hindi</b> (default)</td><td align="center">The <b>same site in English</b>, one tap away (Marathi too)</td></tr>
+<tr>
+<td><img src="docs/screens/sakhi-site.jpg" alt="Sakhi Didi spotlights the live meeting on the website and explains it aloud"></td>
+<td><img src="docs/screens/sabha.jpg" alt="The meeting screen on a laptop: the spoken summary on a stitched register page and the members seated in a circle around a durrie, with coins on their seats and the group's cash in the middle"></td>
+</tr>
+<tr><td align="center"><b>Sakhi Didi</b> walks through the site aloud</td><td align="center">The <b>meeting</b>: register page and the circle of members</td></tr>
 <tr>
 <td><img src="docs/screens/coach.jpg" alt="Meeting: the reply read back with sahi/galat buttons, the coach line with the exact words to say, Meena glowing in the circle"></td>
 <td><img src="docs/screens/sakhi-meeting.jpg" alt="Sakhi spotlights the reply area on the meeting screen"></td>
@@ -167,7 +174,7 @@ This exact meeting is the built-in demo, and it runs through the real engine in 
 ## Proof it works: stress-tested, not demo-tested
 
 ```
- 157 tests · all passing · npm test
+ 158 tests · all passing · npm test
  ├─ 91,000  spoken Hindi amounts (10 → 99,999) parsed back exactly
  ├─  2,000  random amounts × 3 formats (₹, rs, Indian digit grouping)
  ├─    600  seeded random meetings × 45 noisy utterances each
@@ -261,7 +268,7 @@ The heart is `step(state, heard, ledger) → (state, reply, entries)`: a pure fu
 npm install
 npm run dev:api   # API + SQLite on :8787 (Node 22.18+ runs the TypeScript directly)
 npm run dev       # website on http://localhost:3000, /api proxied to :8787
-npm test          # 157 tests
+npm test          # 158 tests
 ```
 
 Production without Docker: `npm run build && npm start` serves everything on port 3000. All settings in [`.env.example`](.env.example) are optional.
