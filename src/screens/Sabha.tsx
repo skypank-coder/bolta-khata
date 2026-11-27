@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MicButton } from '../components/MicButton';
 import { RegisterPage } from '../components/RegisterPage';
 import { SabhaCircle, type Today } from '../components/SabhaCircle';
@@ -26,6 +26,18 @@ export function Sabha({ app }: { app: App }) {
     () => new Set(mstate.meetingId ? meetingTotals(ledger, mstate.meetingId).present : []),
     [ledger, mstate.meetingId],
   );
+
+  // Laptop: Space starts/stops talking, Escape stops (ignored while typing in a field).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (el.closest('input, textarea, select, button, [role=dialog]')) return;
+      if (e.code === 'Space') { e.preventDefault(); app.toggleTalk(); }
+      if (e.code === 'Escape') app.stopLoop();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [app]);
 
   // Money each member brought (or took) today, for the coins on her seat.
   const todayByMember = useMemo(() => {
@@ -156,6 +168,7 @@ export function Sabha({ app }: { app: App }) {
             {app.demoPlaying ? t.stopDemo : t.playDemo}
           </button>
           <p className="mt-2 text-sm text-patra/80">{t.playDemoHint}</p>
+          <p className="mt-1 hidden text-sm text-patra/80 lg:block">{t.keyHint}</p>
         </div>
 
         <div>
@@ -167,7 +180,7 @@ export function Sabha({ app }: { app: App }) {
                 type="button"
                 disabled={busy}
                 onClick={() => app.say(ex)}
-                className="rounded-full border border-patra/30 bg-bahi-dark/40 px-3.5 py-1.5 text-patra hover:bg-bahi-dark/70"
+                className="min-h-[44px] rounded-full border border-patra/30 bg-bahi-dark/40 px-4 py-2 text-patra hover:bg-bahi-dark/70"
               >
                 “{ex}”
               </button>

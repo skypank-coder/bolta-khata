@@ -43,7 +43,7 @@ export function RegisterPage({ entries, allEntries, members, lang, stampKey }: P
         const isLast = e === lastMoney && e.type !== 'reversal' && e.type !== 'cash_count';
         return (
           <li key={e.id} className="relative flex min-h-[44px] animate-write items-center gap-3 pl-16 pr-4">
-            <span className="absolute left-0 w-[52px] pr-2 text-right text-sm text-bahi/70 num">{e.seq}</span>
+            <span className="absolute left-0 w-[52px] pr-2 text-right text-sm text-bahi/90 num">{e.seq}</span>
             <span className={`flex-1 truncate text-lg ${cancelled ? 'text-neel-faint line-through' : ''}`}>
               <span className="font-semibold">{name(e.memberId)}</span>{' '}
               <span className={e.type === 'reversal' ? 'text-bahi' : 'text-neel-soft'}>{t.typeLabel[e.type]}</span>

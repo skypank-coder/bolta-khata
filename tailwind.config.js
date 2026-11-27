@@ -6,7 +6,7 @@ export default {
       colors: {
         bahi: { DEFAULT: '#9E1B1F', dark: '#6E1013', light: '#C8383C' },   // red cloth cover of the register
         patra: { DEFAULT: '#FAEFC4', deep: '#F1DE96', line: '#D9C27A' },    // ledger paper and its ruling
-        neel: { DEFAULT: '#1D2766', soft: '#3B4690', faint: '#8C93C2' },    // indigo ink
+        neel: { DEFAULT: '#1D2766', soft: '#3B4690', faint: '#5A6299' },    // indigo ink
         mohar: { DEFAULT: '#1C7A48', light: '#2E9A60' },                    // green "sahi" stamp
         haldi: { DEFAULT: '#E0A100', light: '#F5C84B' },
       },

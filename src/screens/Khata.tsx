@@ -85,7 +85,7 @@ export function Khata({ app }: { app: App }) {
                     key={e.id}
                     className={`relative grid min-h-[44px] grid-cols-[1fr_auto] items-center gap-x-3 py-1 pl-16 pr-4 ${isBreak ? 'bg-bahi/15' : ''}`}
                   >
-                    <span className="absolute left-0 w-[52px] pr-2 text-right text-sm text-bahi/70 num">{e.seq}</span>
+                    <span className="absolute left-0 w-[52px] pr-2 text-right text-sm text-bahi/90 num">{e.seq}</span>
                     <span className={`min-w-0 truncate ${cancelled ? 'text-neel-faint line-through' : ''}`}>
                       <span className="font-semibold">{name(e.memberId)}</span>{' '}
                       <span className="text-neel-soft">{t.typeLabel[e.type]}</span>
