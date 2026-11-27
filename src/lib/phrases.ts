@@ -95,7 +95,7 @@ function hi(r: Reply, f: Fmt): string {
       return `पिछली एंट्री हटाई: ${f.name(r.entry.memberId)}, ${TYPE.hi[r.entry.type]} ${f.money(r.entry.amount)}। खाते में यह भी लिखा गया।`;
     case 'nothingToUndo': return 'आज की कोई एंट्री हटाने को नहीं है।';
     case 'summary':
-      return `आज ${r.presentCount} लोग हाज़िर। बचत ${f.money(r.savings)}, किस्त ${f.money(r.repayments)}, नया लोन ${f.money(r.loans)}। ग्रुप के पास ${f.money(r.cash)} होने चाहिए।${r.notPaid.length ? ` ${f.list(r.notPaid)} ने आज कुछ जमा नहीं किया।` : ''} सब सही है?`;
+      return `आज ${r.presentCount} लोग हाज़िर। बचत ${f.money(r.savings)}, किस्त ${f.money(r.repayments)}, नया लोन ${f.money(r.loans)}। ग्रुप के पास ${f.money(r.cash)} होने चाहिए।${r.notPaid.length ? ` ${f.list(r.notPaid)} ने आज कुछ जमा नहीं किया।` : ''} नकद गिनकर बोलिए: हाथ में कितना है। फिर बोलिए: सही है।`;
     case 'closed': return 'मीटिंग बंद। रिपोर्ट और सबकी रसीद तैयार है।';
     case 'stillOpen': return 'ठीक है, मीटिंग चालू है।';
     case 'confirmWaiting': return 'पहले बताइए: सही है या ग़लत?';
@@ -103,6 +103,11 @@ function hi(r: Reply, f: Fmt): string {
     case 'notUnderstood': return 'समझ नहीं आया। ऐसे बोलिए: मैं मीना, सौ रुपये बचत।';
     case 'help': return 'नाम, रकम और बचत या किस्त बोलिए। जैसे: मैं मीना, सौ रुपये बचत, पाँच सौ किस्त। अपना हिसाब सुनने के लिए: मेरा कितना जमा है?';
     case 'alreadyClosed': return 'आज की मीटिंग बंद हो चुकी है। नई मीटिंग के लिए बोलिए: मीटिंग शुरू करो।';
+    case 'cashCount': {
+      const d = r.counted - r.expected;
+      if (d === 0) return `नकद ${f.money(r.counted)}। खाते से पूरा मिलता है।`;
+      return `नकद ${f.money(r.counted)}, पर खाते के हिसाब से ${f.money(r.expected)} होने चाहिए। ${f.money(Math.abs(d))} ${d < 0 ? 'कम' : 'ज़्यादा'} है। यह गिनती खाते में दर्ज हो गई।`;
+    }
   }
 }
 
@@ -143,7 +148,7 @@ function mr(r: Reply, f: Fmt): string {
       return `मागची नोंद रद्द: ${f.name(r.entry.memberId)}, ${TYPE.mr[r.entry.type]} ${f.money(r.entry.amount)}. ही नोंदही खात्यात राहील.`;
     case 'nothingToUndo': return 'आजची कोणतीही नोंद रद्द करायला नाही.';
     case 'summary':
-      return `आज ${r.presentCount} जणी हजर. बचत ${f.money(r.savings)}, हप्ते ${f.money(r.repayments)}, नवीन कर्ज ${f.money(r.loans)}. गटाकडे ${f.money(r.cash)} असायला हवेत.${r.notPaid.length ? ` ${f.list(r.notPaid)} यांनी आज काही जमा केलं नाही.` : ''} सगळं बरोबर आहे का?`;
+      return `आज ${r.presentCount} जणी हजर. बचत ${f.money(r.savings)}, हप्ते ${f.money(r.repayments)}, नवीन कर्ज ${f.money(r.loans)}. गटाकडे ${f.money(r.cash)} असायला हवेत.${r.notPaid.length ? ` ${f.list(r.notPaid)} यांनी आज काही जमा केलं नाही.` : ''} रोख मोजून सांगा: हातात किती आहेत. मग सांगा: बरोबर.`;
     case 'closed': return 'मीटिंग बंद. अहवाल आणि सगळ्यांच्या पावत्या तयार आहेत.';
     case 'stillOpen': return 'ठीक आहे, मीटिंग चालू आहे.';
     case 'confirmWaiting': return 'आधी सांगा: बरोबर की चूक?';
@@ -151,6 +156,11 @@ function mr(r: Reply, f: Fmt): string {
     case 'notUnderstood': return 'समजलं नाही. असं सांगा: मी मीना, शंभर रुपये बचत.';
     case 'help': return 'नाव, रक्कम आणि बचत किंवा हप्ता सांगा. उदा: मी मीना, शंभर रुपये बचत. आपला हिशोब ऐकायला: माझी किती बचत आहे?';
     case 'alreadyClosed': return 'आजची मीटिंग बंद झाली आहे. नवीन मीटिंगसाठी सांगा: मीटिंग सुरू करा.';
+    case 'cashCount': {
+      const d = r.counted - r.expected;
+      if (d === 0) return `रोख ${f.money(r.counted)}. खात्याशी पूर्ण जुळते.`;
+      return `रोख ${f.money(r.counted)}, पण खात्याप्रमाणे ${f.money(r.expected)} हवेत. ${f.money(Math.abs(d))} ${d < 0 ? 'कमी' : 'जास्त'} आहेत. ही मोजणी खात्यात नोंदली.`;
+    }
   }
 }
 
@@ -191,7 +201,7 @@ function en(r: Reply, f: Fmt): string {
       return `Last entry cancelled: ${f.name(r.entry.memberId)}, ${TYPE.en[r.entry.type]} ${f.money(r.entry.amount)}. The cancellation is also recorded.`;
     case 'nothingToUndo': return 'There is no entry from today to cancel.';
     case 'summary':
-      return `${r.presentCount} present today. Savings ${f.money(r.savings)}, repayments ${f.money(r.repayments)}, new loans ${f.money(r.loans)}. The group should hold ${f.money(r.cash)}.${r.notPaid.length ? ` ${f.list(r.notPaid)} paid nothing today.` : ''} Is everything right?`;
+      return `${r.presentCount} present today. Savings ${f.money(r.savings)}, repayments ${f.money(r.repayments)}, new loans ${f.money(r.loans)}. The group should hold ${f.money(r.cash)}.${r.notPaid.length ? ` ${f.list(r.notPaid)} paid nothing today.` : ''} Count the cash and say how much is in hand. Then say: right.`;
     case 'closed': return 'Meeting closed. The report and everyone\'s receipts are ready.';
     case 'stillOpen': return 'Okay, the meeting is still open.';
     case 'confirmWaiting': return 'First tell me: right or wrong?';
@@ -199,6 +209,11 @@ function en(r: Reply, f: Fmt): string {
     case 'notUnderstood': return 'I did not understand. Say it like this: I am Meena, one hundred rupees savings.';
     case 'help': return 'Say a name, an amount, and savings or repayment. For example: I am Meena, one hundred savings, five hundred repayment. To hear your balance: how much have I saved?';
     case 'alreadyClosed': return 'Today\'s meeting is closed. To start a new one, say: start the meeting.';
+    case 'cashCount': {
+      const d = r.counted - r.expected;
+      if (d === 0) return `Cash counted: ${f.money(r.counted)}. It matches the ledger exactly.`;
+      return `Cash counted: ${f.money(r.counted)}, but the ledger says ${f.money(r.expected)}. That is ${f.money(Math.abs(d))} ${d < 0 ? 'short' : 'extra'}. The count is recorded.`;
+    }
   }
 }
 
@@ -216,7 +231,7 @@ export const EXAMPLES: Record<Lang, Record<'idle' | 'attendance' | 'entries' | '
   hi: {
     idle: ['मीटिंग शुरू करो'],
     attendance: ['मैं मीना हूँ', 'राधा हाज़िर', 'सुनीता यादव', 'हाज़िरी पूरी'],
-    entries: ['मैं मीना, सौ रुपये बचत', 'रेखा की किस्त पाँच सौ', 'राधा को डेढ़ हज़ार लोन', 'मेरा कितना जमा है?', 'पिछली एंट्री हटाओ', 'मीटिंग बंद करो'],
+    entries: ['मैं मीना, सौ रुपये बचत', 'रेखा की किस्त पाँच सौ', 'राधा को डेढ़ हज़ार लोन', 'मेरा कितना जमा है?', 'पिछली एंट्री हटाओ', 'मीटिंग बंद करो', 'हाथ में बीस हज़ार है'],
     closed: ['मीटिंग शुरू करो'],
   },
   mr: {

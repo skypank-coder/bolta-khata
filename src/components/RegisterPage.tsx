@@ -11,7 +11,7 @@ interface Props {
   stampKey: number;
 }
 
-const MONEY = new Set(['savings', 'repayment', 'loan', 'reversal']);
+const MONEY = new Set(['savings', 'repayment', 'loan', 'reversal', 'cash_count']);
 
 /** Today's page of the register, written line by line as the group speaks. */
 export function RegisterPage({ entries, allEntries, members, lang, stampKey }: Props) {
@@ -40,7 +40,7 @@ export function RegisterPage({ entries, allEntries, members, lang, stampKey }: P
       )}
       {money.map((e) => {
         const cancelled = reversed.has(e.id);
-        const isLast = e === lastMoney && e.type !== 'reversal';
+        const isLast = e === lastMoney && e.type !== 'reversal' && e.type !== 'cash_count';
         return (
           <li key={e.id} className="relative flex min-h-[44px] items-center gap-3 pl-16 pr-4">
             <span className="absolute left-0 w-[52px] pr-2 text-right text-sm text-bahi/70 num">{e.seq}</span>
@@ -53,7 +53,7 @@ export function RegisterPage({ entries, allEntries, members, lang, stampKey }: P
                 cancelled ? 'text-neel-faint line-through' : e.type === 'loan' || e.type === 'reversal' ? 'text-bahi' : 'text-neel'
               }`}
             >
-              {e.type === 'loan' || e.type === 'reversal' ? '−' : '+'}{formatRupees(e.amount)}
+              {e.type === 'cash_count' ? '' : e.type === 'loan' || e.type === 'reversal' ? '−' : '+'}{formatRupees(e.amount)}
             </span>
             {isLast && !cancelled && (
               <span

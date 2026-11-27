@@ -26,6 +26,7 @@ export type Intent =
   | { kind: 'help' }
   | { kind: 'repeat' }
   | { kind: 'queryGroup' }
+  | { kind: 'cashCount'; amount: number }
   | { kind: 'querySelf'; member: MatchResult; selfRef: boolean }
   | EntryIntent
   | { kind: 'name'; member: MatchResult }
@@ -60,6 +61,9 @@ const APPROVE = w(['manzoor', 'manjoor', 'manjur', 'manzur', 'approve', 'approve
 const SELF = w(['main', 'mai', 'mein', 'mera', 'meri', 'mere', 'mujhe', 'maine', 'mi', 'majha', 'majhi', 'mazha', 'mazi', 'my', 'i', 'me', 'mine']);
 const QUESTION = w(['kitna', 'kitni', 'kitne', 'kiti', 'kevdha', 'how', 'much', 'kya', 'batao', 'bataiye', 'sangaa', 'sanga', 'balance', 'hisab', 'hisaab']);
 const GROUP = w(['group', 'samuh', 'samooh', 'sabha', 'gat', 'sangh']);
+/** Words used when the cash box is counted: "haath mein 20,100 hai", "nakad gina 20100", "rokh 20100". */
+const CASH = w(['haath', 'hath', 'haat', 'nakad', 'nakd', 'nakdi', 'cash', 'rokad', 'rokh', 'rok', 'ginti', 'gina', 'gini',
+  'ginkar', 'counted', 'count', 'hand', 'galla', 'peti', 'dabba', 'bakse', 'baksa']);
 
 const PHRASES = {
   start: ['meeting shuru', 'meeting suru', 'sabha shuru', 'baithak shuru', 'baithak suru', 'shuru karo', 'shuru kare', 'suru kara',
@@ -153,6 +157,9 @@ export function parseIntent(text: string, members: NamedMember[]): Intent {
   const selfRef = folded.some((f) => SELF.has(f));
   const isQuestion = folded.some((f) => QUESTION.has(f));
 
+  if (spans.length === 1 && !member.best && folded.some((f) => CASH.has(f)) && !folded.some((f) => classifyKeyword(f))) {
+    return { kind: 'cashCount', amount: spans[0].value };
+  }
   if (hasPhrase(joined, PHRASES.groupMoney) || (isQuestion && folded.some((f) => GROUP.has(f)) && !member.best)) {
     return { kind: 'queryGroup' };
   }

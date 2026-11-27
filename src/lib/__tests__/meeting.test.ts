@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { appendEntries, computeBalances, memberBalance, verifyChain, type LedgerEntry } from '../ledger';
 import { initialState, step, type MeetingState, type Reply } from '../meeting';
-import { buildDemoData } from '../store';
+import { buildDemoData, DEMO_GROUP } from '../store';
+
+const DEMO_GROUP_MEMBERS = DEMO_GROUP.members;
 
 /** Drive a whole meeting the way the app does: hear -> step -> append drafts. */
 async function meeting() {
@@ -129,7 +131,7 @@ describe('examples shown on screen are understood', async () => {
   const expected: Record<string, string> = {
     'मीटिंग शुरू करो': 'start', 'मैं मीना हूँ': 'name', 'राधा हाज़िर': 'name', 'सुनीता यादव': 'name', 'हाज़िरी पूरी': 'attendanceDone',
     'मैं मीना, सौ रुपये बचत': 'entry', 'रेखा की किस्त पाँच सौ': 'entry', 'राधा को डेढ़ हज़ार लोन': 'entry',
-    'मेरा कितना जमा है?': 'querySelf', 'पिछली एंट्री हटाओ': 'undo', 'मीटिंग बंद करो': 'end',
+    'मेरा कितना जमा है?': 'querySelf', 'पिछली एंट्री हटाओ': 'undo', 'मीटिंग बंद करो': 'end', 'हाथ में बीस हज़ार है': 'cashCount',
     'मीटिंग सुरू करा': 'start', 'मी मीना': 'name', 'राधा हजर': 'name', 'हजेरी पूर्ण': 'attendanceDone',
     'मी मीना, शंभर रुपये बचत': 'entry', 'रेखा हप्ता पाचशे': 'entry', 'राधाला दीड हजार कर्ज': 'entry',
     'माझी किती बचत आहे?': 'querySelf', 'मीटिंग बंद करा': 'end',
@@ -226,5 +228,28 @@ describe('a meeting does not get stuck', () => {
     await m.say('Geeta 200 bachat');
     expect(await m.say('Meena ki kitni bachat hai')).toMatchObject({ key: 'selfBalance', member: 'm01' });
     expect((await m.say('sahi hai')).key).toBe('saved');
+  });
+});
+
+describe('counting the cash box by voice', () => {
+  it('compares the count with the khata and records it in the chain', async () => {
+    const m = await meeting();
+    await m.say('meeting shuru karo');
+    const expected = computeBalances(m.ledger).groupCash;
+    expect(await m.say('meeting band karo')).toMatchObject({ key: 'summary' });
+    expect(await m.say(`haath mein ${expected - 100} hai`)).toEqual({ key: 'cashCount', counted: expected - 100, expected });
+    expect(m.ledger.at(-1)).toMatchObject({ type: 'cash_count', amount: expected - 100, note: String(expected) });
+    expect(computeBalances(m.ledger).groupCash).toBe(expected);
+    // Still waiting to close after the count.
+    expect((await m.say('sahi hai')).key).toBe('closed');
+    expect((await verifyChain(m.ledger)).ok).toBe(true);
+  });
+
+  it('understands the count in Devanagari Hindi and Marathi', async () => {
+    const { parseIntent } = await import('../intent');
+    expect(parseIntent('हाथ में बीस हज़ार एक सौ है', DEMO_GROUP_MEMBERS)).toEqual({ kind: 'cashCount', amount: 20100 });
+    expect(parseIntent('रोख वीस हजार', DEMO_GROUP_MEMBERS)).toEqual({ kind: 'cashCount', amount: 20000 });
+    expect(parseIntent('nakad gina 19500', DEMO_GROUP_MEMBERS)).toEqual({ kind: 'cashCount', amount: 19500 });
+    expect(parseIntent('Meena 500 bachat', DEMO_GROUP_MEMBERS).kind).toBe('entry');
   });
 });

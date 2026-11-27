@@ -75,7 +75,8 @@ export type Reply =
   | { key: 'notHeard'; repeated: boolean }
   | { key: 'notUnderstood' }
   | { key: 'help' }
-  | { key: 'alreadyClosed' };
+  | { key: 'alreadyClosed' }
+  | { key: 'cashCount'; counted: number; expected: number };
 
 export interface StepResult {
   state: MeetingState;
@@ -297,6 +298,14 @@ export function step(state: MeetingState, heard: Heard, ctx: Ctx): StepResult {
   }
 
   if (intent.kind === 'start') return reply(s, { key: 'stillOpen' });
+
+  // Counting the cash box: compare with what the khata says, and lock the count into the chain.
+  if (intent.kind === 'cashCount') {
+    const expected = computeBalances(ctx.ledger).groupCash;
+    return reply(s, { key: 'cashCount', counted: intent.amount, expected }, [{
+      type: 'cash_count', memberId: null, amount: intent.amount, meetingId: s.meetingId, spoken: text, note: String(expected),
+    }]);
+  }
 
   // Answer the question we are waiting on first.
   const p = s.pending;

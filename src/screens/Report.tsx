@@ -111,6 +111,8 @@ export function Report({ app }: { app: App }) {
   const totals = meetingTotals(data.ledger, meetingId);
   const cash = computeBalances(data.ledger, built.lastSeq).groupCash;
   const name = (m: Member) => (lang === 'en' ? m.name : m.nameLocal ?? m.name);
+  const count = [...data.ledger].reverse().find((e) => e.meetingId === meetingId && e.type === 'cash_count');
+  const countDiff = count ? count.amount - Number(count.note) : 0;
 
   return (
     <div className="mx-auto max-w-5xl space-y-5 px-4 pb-16 pt-4">
@@ -156,7 +158,13 @@ export function Report({ app }: { app: App }) {
             </div>
           ))}
         </dl>
-        <p className="pb-3 text-lg">{r.cashNow}: <strong className="font-display text-2xl num">{formatRupees(cash)}</strong></p>
+        <p className="pb-1 text-lg">{r.cashNow}: <strong className="font-display text-2xl num">{formatRupees(cash)}</strong></p>
+        <p className={`mb-3 inline-block rounded-md px-2 py-1 ${!count ? 'text-neel-soft' : countDiff === 0 ? 'bg-mohar/15 text-mohar' : 'bg-bahi/15 text-bahi'}`}>
+          {count
+            ? `${r.cashCounted}: ${formatRupees(count.amount)}, ${r.cashExpected} ${formatRupees(Number(count.note))}. ${
+                countDiff === 0 ? r.cashMatch : `${formatRupees(Math.abs(countDiff))} ${countDiff < 0 ? r.cashShort : r.cashExtra}`}`
+            : r.cashNotCounted}
+        </p>
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] border-collapse text-left">

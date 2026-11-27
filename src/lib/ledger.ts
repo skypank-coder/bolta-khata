@@ -15,7 +15,8 @@ export type EntryType =
   | 'reversal'     // cancels an earlier entry
   | 'meeting_open'
   | 'meeting_close'
-  | 'attendance';
+  | 'attendance'
+  | 'cash_count';   // leader counted the cash box: amount = counted, note = what the khata expected
 
 export interface EntryDraft {
   type: EntryType;
