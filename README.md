@@ -8,7 +8,7 @@
 *Now every one of them can hear it.*
 
 ![Voice-first](https://img.shields.io/badge/voice--first-Hindi%20%C2%B7%20Marathi%20%C2%B7%20English-9E1B1F?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-134%20passing-1C7A48?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-139%20passing-1C7A48?style=for-the-badge)
 ![Keys needed](https://img.shields.io/badge/API%20keys-none-1D2766?style=for-the-badge)
 ![Offline](https://img.shields.io/badge/works-offline-E0A100?style=for-the-badge)
 
@@ -30,6 +30,21 @@
 <td align="center"><b>Close.</b> Count the cash box by voice. ₹100 short? It is said out loud and locked in.</td>
 </tr>
 </table>
+
+## Anyone can use it, without being taught
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screens/coach.jpg" alt="Under the reply, a coach line says what to do now and shows the exact words to say as big buttons; Meena glows in the member circle"></td>
+<td width="50%"><img src="docs/screens/help.jpg" alt="Help sheet with six picture cards that read themselves aloud, each with a try-it phrase, and a ladder of what the group has learned"></td>
+</tr>
+<tr>
+<td align="center"><b>A coach under every reply.</b> One plain line: what to do now, and the exact words to say, as big buttons. Nobody has to remember anything.</td>
+<td align="center"><b>Help that talks.</b> Six picture cards, each read aloud with 🔊, each with a phrase to try. A ladder ticks off what your group has already done.</td>
+</tr>
+</table>
+
+A test walks real meetings in all three languages and **tries every phrase the coach can ever suggest, in the state it suggests it**, so the coach can never tell a group to say something the app will not understand.
 
 ---
 
@@ -146,16 +161,19 @@ The step where SHG money really goes missing is the end-of-meeting cash count. S
 ### 🪔 7. It looks like the meeting it serves
 The members sit in a **circle around a durrie**, the way an SHG actually meets. Present members fill their seat, absent ones stay dashed, the woman whose money is on the table **glows**, today's deposits and loans appear as **coins on her seat**, and the group's cash sits in the middle. The register has a **stitched cloth binding**, lines are **written in like ink**, a new meeting **turns a fresh page**, and the green *सही* stamp lands with a **thump**.
 
-### 👥 8. A real group, set up by voice
+### ✨ 8. Money you can see move
+When a member saves, **three gold coins fly from her seat into the group pot** and the pot glows; a loan sends them **out of the pot to her seat**. Closing a meeting or welcoming a new member brings a **shower of marigold (genda) petals**. Each reply **appears word by word** as it is spoken, so slower readers can follow the voice. All of it switches off for people who prefer reduced motion.
+
+### 👥 9. A real group, set up by voice
 Start your own group, then *"नया सदस्य जोड़ो: पुष्पा देवी"*. The name is read back and added only on *"सही है"*, duplicates are refused even across scripts (*Suman Sharma* = *सुमन शर्मा*), and every joining is locked into the chain.
 
-### 🌳 9. Built for a meeting under a tree
+### 🌳 10. Built for a meeting under a tree
 - **Hands-free**: tap once; it listens, answers and listens again for the whole meeting.
 - **Offline**: installable PWA; the ledger lives on the phone (IndexedDB). Nothing is sent to any server.
 - **Three languages**, and Hindi/Marathi spoken in Devanagari by the phone's own voice.
 - **Live mic-level ring**, so speakers can see they are being heard.
 
-### 🏦 10. Output a bank will accept
+### 🏦 11. Output a bank will accept
 Meeting report (print / save as PDF), CSV for the federation or bank, and a receipt per member that can be **read aloud in her language** or **sent on WhatsApp**.
 
 ---
@@ -163,7 +181,7 @@ Meeting report (print / save as PDF), CSV for the federation or bank, and a rece
 ## Stress-tested, not demo-tested
 
 ```
- 134 tests · all passing
+ 139 tests · all passing
  ├─ 91,000  spoken Hindi amounts (10 → 99,999) parsed back exactly
  ├─  2,000  random amounts × 3 formats (₹, rs, Indian digit grouping)
  ├─    600  seeded random meetings × 45 noisy utterances each
@@ -173,6 +191,7 @@ Meeting report (print / save as PDF), CSV for the federation or bank, and a rece
  │          loans never below zero · no money written without a "yes" ·
  │          no member ever added twice
  ├─      3  full demo meetings (Hindi, Marathi, English) through the real engine
+ ├─      3  coach walks: every suggested phrase, in every state, in every language
  └─     ...  every example sentence shown on screen, in every language
 ```
 
