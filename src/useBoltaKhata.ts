@@ -8,8 +8,19 @@ import {
   type Heard, type ListenError, type ListenHandle,
 } from './lib/speech';
 import { buildDemoData, buildNewGroup, loadData, saveData, type AppData, type Lang } from './lib/store';
+import { api, type Role } from './lib/api';
+import { mergeLedgers } from './lib/sync';
+import { getDeviceLang, setDeviceLang } from './lib/prefs';
 
 export type Status = 'idle' | 'listening' | 'thinking' | 'speaking';
+export type SyncStatus = 'local' | 'saved' | 'syncing' | 'offline' | 'error';
+
+export interface KhataOptions {
+  /** Where this group's copy lives on the phone. */
+  storageKey?: string;
+  /** A group saved in the cloud for a signed-in account. Without it, a local demo group. */
+  remoteId?: string;
+}
 
 const SAVED_KEYS = new Set<Reply['key']>(['saved', 'loanSaved', 'present', 'closed', 'undone']);
 const ERROR_KEYS = new Set<Reply['key']>(['notHeard', 'notUnderstood', 'loanNoCash', 'noLoanToRepay']);
@@ -23,7 +34,9 @@ export interface Exchange {
   rendered: Rendered;
 }
 
-export function useBoltaKhata() {
+export function useBoltaKhata(opts: KhataOptions = {}) {
+  const storageKey = opts.storageKey ?? 'app';
+  const remoteId = opts.remoteId;
   const [data, setData] = useState<AppData | null>(null);
   const [mstate, setMstate] = useState<MeetingState>(initialState);
   const [status, setStatus] = useState<Status>('idle');
@@ -35,6 +48,11 @@ export function useBoltaKhata() {
   const [stampKey, setStampKey] = useState(0);
   const [petalKey, setPetalKey] = useState(0);
   const [demoPlaying, setDemoPlaying] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(remoteId ? 'syncing' : 'local');
+  const [role, setRole] = useState<Role>('owner');
+  const [joinCode, setJoinCode] = useState<string | undefined>();
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [conflict, setConflict] = useState(false);
 
   const dataRef = useRef<AppData | null>(null);
   const stateRef = useRef<MeetingState>(initialState);
@@ -43,24 +61,116 @@ export function useBoltaKhata() {
   const exchangeId = useRef(0);
   const demoRef = useRef(false);
 
+  const syncedRef = useRef(0);
+  const membersRef = useRef('');
+  const pushingRef = useRef(false);
+  const pushAgainRef = useRef(false);
+  const roleRef = useRef<Role>('owner');
+
   const commitData = useCallback((next: AppData) => {
     dataRef.current = next;
     setData(next);
-    void saveData(next);
-  }, []);
+    void saveData(next, storageKey);
+  }, [storageKey]);
 
-  // Load from the phone, or seed the demo group on first run.
+  /** Bring in the server's copy; keep anything this phone wrote that the server has not seen. */
+  const pull = useCallback(async (local: AppData | null): Promise<AppData | null> => {
+    if (!remoteId) return local;
+    const r = await api.group(remoteId);
+    roleRef.current = r.role;
+    setRole(r.role);
+    setJoinCode(r.joinCode);
+    const settings = local?.settings ?? { lang: getDeviceLang(), handsFree: true, welcomed: true };
+    const serverSeq = r.entries.at(-1)?.seq ?? 0;
+    syncedRef.current = serverSeq;
+    if (!local) {
+      membersRef.current = JSON.stringify(r.group.members);
+      return { group: r.group, ledger: r.entries, settings, syncedSeq: serverSeq };
+    }
+    const m = mergeLedgers(local.ledger, r.entries);
+    setConflict(m.conflict);
+    const keepLocalMembers = m.toPush.length > 0 || local.group.members.length > r.group.members.length;
+    membersRef.current = JSON.stringify(r.group.members);
+    return {
+      ...local,
+      group: { ...r.group, members: keepLocalMembers ? local.group.members : r.group.members },
+      ledger: m.ledger,
+      syncedSeq: serverSeq,
+      tamperBackup: undefined,
+    };
+  }, [remoteId]);
+
+  /** Send new entries (and member changes) to the server. Append-only; the server re-checks the chain. */
+  const push = useCallback(async (): Promise<void> => {
+    const d = dataRef.current;
+    if (!remoteId || !d || roleRef.current !== 'owner' || d.tamperBackup) return;
+    if (pushingRef.current) { pushAgainRef.current = true; return; }
+    const entries = d.ledger.filter((e) => e.seq > syncedRef.current);
+    const members = JSON.stringify(d.group.members);
+    if (!entries.length && members === membersRef.current) { setSyncStatus('saved'); return; }
+    pushingRef.current = true;
+    setSyncStatus('syncing');
+    try {
+      const r = await api.sync(remoteId, syncedRef.current, d.group.members, entries);
+      syncedRef.current = r.lastSeq;
+      membersRef.current = members;
+      const latest = dataRef.current;
+      if (latest) { latest.syncedSeq = r.lastSeq; void saveData(latest, storageKey); }
+      setSyncStatus('saved');
+    } catch (e) {
+      const err = e as { status?: number };
+      if (err.status === 409) {
+        // Another phone wrote first: take its entries, then try again.
+        const merged = await pull(dataRef.current).catch(() => null);
+        if (merged) { commitData(merged); pushAgainRef.current = true; }
+      } else {
+        setSyncStatus(err.status === 0 ? 'offline' : 'error');
+      }
+    } finally {
+      pushingRef.current = false;
+      if (pushAgainRef.current) { pushAgainRef.current = false; void push(); }
+    }
+  }, [commitData, pull, remoteId, storageKey]);
+
+  // Load this group: the phone's copy first (works offline), then the server's.
   useEffect(() => {
     (async () => {
-      const stored = (await loadData()) ?? (await buildDemoData());
-      dataRef.current = stored;
-      const resumed = resumeState(stored.ledger);
+      let d = await loadData(storageKey);
+      if (remoteId) {
+        syncedRef.current = d?.syncedSeq ?? 0;
+        try {
+          d = await pull(d);
+        } catch (e) {
+          const code = (e as { code?: string }).code ?? 'error';
+          if (!d) { setLoadError(code); return; }
+          setSyncStatus(code === 'offline' ? 'offline' : 'error');
+        }
+      }
+      d ??= await buildDemoData(getDeviceLang());
+      d = { ...d, settings: { ...d.settings, lang: getDeviceLang(), ...(remoteId ? { welcomed: true } : {}) } };
+      dataRef.current = d;
+      const resumed = resumeState(d.ledger);
       stateRef.current = resumed;
       setMstate(resumed);
-      setData(stored);
-      void saveData(stored);
+      setData(d);
+      void saveData(d, storageKey);
+      if (remoteId) void push();
     })();
-  }, []);
+  }, [pull, push, remoteId, storageKey]);
+
+  // Every change is sent shortly after it is written; and again when the phone comes back online.
+  useEffect(() => {
+    if (!remoteId || !data) return;
+    const t = setTimeout(() => void push(), 600);
+    return () => clearTimeout(t);
+  }, [data, push, remoteId]);
+  useEffect(() => {
+    if (!remoteId) return;
+    const on = () => void push();
+    window.addEventListener('online', on);
+    const every = setInterval(on, 20000);
+    return () => { window.removeEventListener('online', on); clearInterval(every); };
+  }, [push, remoteId]);
 
   // Re-check the hash chain whenever the khata changes.
   useEffect(() => {
@@ -201,6 +311,7 @@ export function useBoltaKhata() {
   }, [process, stopLoop]);
 
   const updateSettings = useCallback((patch: Partial<AppData['settings']>) => {
+    if (patch.lang) setDeviceLang(patch.lang);
     const d = dataRef.current;
     if (d) commitData({ ...d, settings: { ...d.settings, ...patch } });
   }, [commitData]);
@@ -283,6 +394,8 @@ export function useBoltaKhata() {
   return {
     data, lang, mstate, status, interim, exchanges, error, level, chain, balances, stampKey, petalKey,
     toggleTalk, say, updateSettings, resetDemo, tamper, undoTamper, stopLoop, playDemo, demoPlaying, startNewGroup,
+    isDemo: !remoteId, syncStatus, role, readOnly: !!remoteId && role === 'viewer', joinCode, loadError, conflict,
+    syncNow: push,
     lastExchange: exchanges[exchanges.length - 1] ?? null,
   };
 }

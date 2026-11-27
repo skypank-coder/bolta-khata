@@ -36,6 +36,8 @@ export interface AppData {
   settings: Settings;
   /** Set only during the tamper demo, so the original entry can be put back. */
   tamperBackup?: { index: number; entry: LedgerEntry };
+  /** Last ledger seq the server has confirmed (cloud groups only). */
+  syncedSeq?: number;
 }
 
 const DB_NAME = 'bolta-khata';
@@ -61,17 +63,17 @@ async function idb<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRe
   });
 }
 
-export async function loadData(): Promise<AppData | null> {
+export async function loadData(key = KEY): Promise<AppData | null> {
   try {
-    return (await idb<AppData | undefined>('readonly', (s) => s.get(KEY))) ?? null;
+    return (await idb<AppData | undefined>('readonly', (s) => s.get(key))) ?? null;
   } catch {
     return null;
   }
 }
 
-export async function saveData(data: AppData): Promise<void> {
+export async function saveData(data: AppData, key = KEY): Promise<void> {
   try {
-    await idb('readwrite', (s) => s.put(data, KEY));
+    await idb('readwrite', (s) => s.put(data, key));
   } catch {
     // Private mode or storage blocked: the app keeps working in memory.
   }
