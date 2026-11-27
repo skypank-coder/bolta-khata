@@ -77,20 +77,35 @@ export function useBoltaKhata() {
 
   const lang: Lang = data?.settings.lang ?? 'hi';
 
+  /**
+   * Understand and write one turn. Turns are queued one after another: two quick taps
+   * must never both read the same ledger and overwrite each other's entry.
+   */
+  const queueRef = useRef<Promise<unknown>>(Promise.resolve());
+  const understand = useCallback((heard: { text: string; alternatives?: string[]; confidence?: number }) => {
+    const run = queueRef.current.then(async () => {
+      const current = dataRef.current;
+      if (!current) return null;
+      const r = step(stateRef.current, heard, { members: current.group.members, ledger: current.ledger });
+      stateRef.current = r.state;
+      setMstate(r.state);
+      let next = current;
+      if (r.drafts.length) {
+        next = { ...current, ledger: await appendEntries(current.ledger, r.drafts) };
+        commitData(next);
+      }
+      return { r, next };
+    });
+    queueRef.current = run.catch(() => undefined);
+    return run;
+  }, [commitData]);
+
   /** One turn of the conversation: understand, write, answer out loud. */
   const process = useCallback(async (heard: { text: string; alternatives?: string[]; confidence?: number }, shownAs?: string) => {
-    const current = dataRef.current;
-    if (!current) return null;
     setStatus('thinking');
-    const r = step(stateRef.current, heard, { members: current.group.members, ledger: current.ledger });
-    stateRef.current = r.state;
-    setMstate(r.state);
-
-    let next = current;
-    if (r.drafts.length) {
-      next = { ...current, ledger: await appendEntries(current.ledger, r.drafts) };
-      commitData(next);
-    }
+    const done = await understand(heard);
+    if (!done) return null;
+    const { r, next } = done;
     const rendered = render(r.reply, next.settings.lang, next.group.members);
     const id = ++exchangeId.current;
     setExchanges((xs) => [...xs.slice(-30), { id, heard: shownAs ?? heard.text, reply: r.reply, rendered }]);
@@ -103,7 +118,7 @@ export function useBoltaKhata() {
     setStatus('speaking');
     await speak(rendered.say, SPEECH_LANG[next.settings.lang]);
     return r;
-  }, [commitData]);
+  }, [understand]);
 
   const stopLoop = useCallback(() => {
     loopRef.current = false;
@@ -122,7 +137,8 @@ export function useBoltaKhata() {
       if (!d) break;
       setStatus('listening');
       setInterim('');
-      cueListen();
+      // "Your turn" note only after the app has spoken, not again after every quiet pause.
+      if (silent === 0) cueListen();
       const handle = listen(SPEECH_LANG[d.settings.lang], setInterim);
       listenRef.current = handle;
       let heard: Heard;
