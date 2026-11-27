@@ -78,7 +78,7 @@ export function useBoltaKhata() {
   const lang: Lang = data?.settings.lang ?? 'hi';
 
   /** One turn of the conversation: understand, write, answer out loud. */
-  const process = useCallback(async (heard: { text: string; alternatives?: string[]; confidence?: number }) => {
+  const process = useCallback(async (heard: { text: string; alternatives?: string[]; confidence?: number }, shownAs?: string) => {
     const current = dataRef.current;
     if (!current) return null;
     setStatus('thinking');
@@ -93,7 +93,7 @@ export function useBoltaKhata() {
     }
     const rendered = render(r.reply, next.settings.lang, next.group.members);
     const id = ++exchangeId.current;
-    setExchanges((xs) => [...xs.slice(-30), { id, heard: heard.text, reply: r.reply, rendered }]);
+    setExchanges((xs) => [...xs.slice(-30), { id, heard: shownAs ?? heard.text, reply: r.reply, rendered }]);
     if (SAVED_KEYS.has(r.reply.key)) {
       cueSaved();
       if (r.reply.key === 'saved' || r.reply.key === 'loanSaved') setStampKey((k) => k + 1);
@@ -160,9 +160,9 @@ export function useBoltaKhata() {
   }, [runLoop, status, stopLoop]);
 
   /** Typed text or a tapped example: goes through exactly the same engine. */
-  const say = useCallback(async (text: string) => {
+  const say = useCallback(async (text: string, shownAs?: string) => {
     if (loopRef.current) stopLoop();
-    await process({ text });
+    await process({ text }, shownAs);
     setStatus('idle');
   }, [process, stopLoop]);
 
