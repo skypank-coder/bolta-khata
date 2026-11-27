@@ -3,7 +3,7 @@ import type { Group, Member } from './store';
 
 /** Thin client for the Bolta Khata server. The session lives in an HttpOnly cookie. */
 
-export interface User { id: string; phone: string; name: string }
+export interface User { id: string; phone: string; name: string; guest?: boolean }
 export type Role = 'owner' | 'viewer';
 
 export interface GroupSummary {
@@ -46,6 +46,8 @@ export const api = {
   signup: (phone: string, name: string, pin: string) => call<{ user: User }>('POST', '/api/auth/signup', { phone, name, pin }),
   login: (phone: string, pin: string) => call<{ user: User }>('POST', '/api/auth/login', { phone, pin }),
   logout: () => call<{ ok: true }>('POST', '/api/auth/logout'),
+  guest: (name: string) => call<{ user: User }>('POST', '/api/auth/guest', { name }),
+  claim: (phone: string, name: string, pin: string) => call<{ user: User }>('POST', '/api/auth/claim', { phone, name, pin }),
   groups: () => call<{ groups: GroupSummary[] }>('GET', '/api/groups'),
   createGroup: (g: { id: string; name: string; village: string; members: Member[]; entries: LedgerEntry[] }) =>
     call<{ id: string; joinCode: string; lastSeq: number }>('POST', '/api/groups', g),

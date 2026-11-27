@@ -8,7 +8,7 @@ import { SITE } from '../lib/site';
 import { buildDemoData, buildNewGroup, saveData } from '../lib/store';
 
 /** Every group this person runs or follows: a leader sees hers, an NGO worker sees all of theirs. */
-export function Dashboard({ user, go, onLogout }: { user: User; go: (to: string) => void; onLogout: () => void }) {
+export function Dashboard({ user, go, onLogout, onUser }: { user: User; go: (to: string) => void; onLogout: () => void; onUser: (u: User) => void }) {
   const [lang] = useDeviceLang();
   const d = SITE[lang].dash;
   const [groups, setGroups] = useState<GroupSummary[] | null>(null);
@@ -17,6 +17,7 @@ export function Dashboard({ user, go, onLogout }: { user: User; go: (to: string)
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [claim, setClaim] = useState({ phone: '', name: '', pin: '' });
 
   const load = () => api.groups().then((r) => { setGroups(r.groups); setLoadErr(false); }).catch(() => setLoadErr(true));
   useEffect(() => { void load(); }, []);
@@ -89,6 +90,32 @@ export function Dashboard({ user, go, onLogout }: { user: User; go: (to: string)
             </dl>
           )}
         </div>
+
+        {user.guest && (
+          <form
+            className="rounded-2xl bg-patra p-5 text-neel shadow-[0_0_0_4px_#E0A100]"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setMsg(null);
+              try {
+                const r = await api.claim(claim.phone, claim.name, claim.pin);
+                onUser(r.user);
+              } catch (err) {
+                const errs = SITE[lang].auth.errors;
+                setMsg(errs[err instanceof ApiError ? err.code : 'default'] ?? errs.default);
+              }
+            }}
+          >
+            <p className="font-display text-2xl text-bahi">{d.guestTitle}</p>
+            <p className="mt-1">{d.guestHint}</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_10rem_auto] sm:items-end">
+              <label className="text-sm font-semibold">{SITE[lang].auth.phone}<input className="field" type="tel" inputMode="numeric" required placeholder="98765 43210" value={claim.phone} onChange={(e) => setClaim({ ...claim, phone: e.target.value })} /></label>
+              <label className="text-sm font-semibold">{SITE[lang].auth.name}<input className="field" required value={claim.name} onChange={(e) => setClaim({ ...claim, name: e.target.value })} /></label>
+              <label className="text-sm font-semibold">PIN<input className="field tracking-[0.4em]" type="password" inputMode="numeric" maxLength={6} required placeholder="••••" value={claim.pin} onChange={(e) => setClaim({ ...claim, pin: e.target.value.replace(/\D/g, '') })} /></label>
+              <button type="submit" className="min-h-[52px] rounded-xl bg-bahi px-5 font-display text-xl text-patra">{d.claim}</button>
+            </div>
+          </form>
+        )}
 
         {loadErr && <p role="alert" className="rounded-lg bg-haldi p-3 font-semibold text-bahi-dark">{SITE[lang].auth.errors.offline}</p>}
         {groups && groups.length === 0 && <p className="text-xl text-patra/90">{d.empty}</p>}

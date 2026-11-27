@@ -1,14 +1,25 @@
 import { HeroDemo } from '../components/HeroDemo';
 import { LangSwitch } from '../components/LangSwitch';
+import { TrialButton } from '../components/TrialButton';
+import { SakhiButton, Tour } from '../components/Tour';
+import { SITE_TOUR, markTourSeen, tourSeen } from '../lib/tours';
+import { useEffect, useState } from 'react';
 import type { User } from '../lib/api';
 import { useDeviceLang } from '../lib/prefs';
 import { SITE } from '../lib/site';
 import { UI } from '../lib/ui';
 
 /** The public website: what it is, how a meeting works, who it is for, and a way in. */
-export function Landing({ user, go }: { user: User | null; go: (to: string) => void }) {
+export function Landing({ user, go, onTrial }: { user: User | null; go: (to: string) => void; onTrial: () => Promise<void> }) {
   const [lang] = useDeviceLang();
   const s = SITE[lang];
+  const [touring, setTouring] = useState(false);
+  // Sakhi greets first-time visitors and walks them through the page.
+  useEffect(() => {
+    if (tourSeen('site')) return;
+    const t = setTimeout(() => setTouring(true), 1400);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -35,24 +46,39 @@ export function Landing({ user, go }: { user: User | null; go: (to: string) => v
             <h1 className="font-display text-6xl leading-none sm:text-7xl">{s.hero.title}</h1>
             <p className="mt-4 font-display text-3xl leading-tight text-haldi-light sm:text-4xl">{s.hero.line}</p>
             <p className="mt-5 max-w-xl text-xl leading-relaxed text-patra/90">{s.hero.sub}</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => go(user ? '/groups' : '/signup')}
-                className="min-h-[56px] whitespace-nowrap rounded-xl bg-haldi px-5 font-display text-xl text-bahi-dark shadow-[0_5px_0_#8a6200] active:translate-y-1"
-              >
-                {user ? s.hero.open : s.hero.primary}
-              </button>
-              <button
-                type="button"
-                onClick={() => go('/demo')}
-                className="min-h-[56px] whitespace-nowrap rounded-xl bg-patra px-5 font-display text-xl text-bahi shadow-[0_5px_0_#4a0a0c] active:translate-y-1"
-              >
-                ▶ {s.hero.secondary}
-              </button>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-start">
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => go('/groups')}
+                  className="min-h-[60px] whitespace-nowrap rounded-xl bg-haldi px-6 font-display text-2xl text-bahi-dark shadow-[0_5px_0_#8a6200] active:translate-y-1"
+                >
+                  {s.hero.open}
+                </button>
+              ) : (
+                <div data-tour="trial"><TrialButton
+                  onTrial={onTrial}
+                  label={`▶ ${s.hero.trial}`}
+                  className="min-h-[60px] whitespace-nowrap rounded-xl bg-haldi px-6 font-display text-2xl text-bahi-dark shadow-[0_5px_0_#8a6200] active:translate-y-1"
+                /></div>
+              )}
+              {!user && (
+                <button
+                  type="button"
+                  data-tour="signup"
+                  onClick={() => go('/signup')}
+                  className="min-h-[60px] whitespace-nowrap rounded-xl bg-patra px-6 font-display text-2xl text-bahi shadow-[0_5px_0_#4a0a0c] active:translate-y-1"
+                >
+                  {s.hero.primary}
+                </button>
+              )}
             </div>
+            {!user && <p className="mt-3 max-w-xl text-patra/85">{s.hero.trialHint}</p>}
+            <button type="button" onClick={() => go('/demo')} className="mt-2 text-patra/85 underline underline-offset-4 hover:text-patra">
+              {s.hero.offlineDemo}
+            </button>
           </div>
-          <HeroDemo lang={lang} heardLabel={UI[lang].heard} stamp={UI[lang].stampOk} />
+          <div data-tour="hero-demo"><HeroDemo lang={lang} heardLabel={UI[lang].heard} stamp={UI[lang].stampOk} /></div>
         </div>
         <dl className="border-t border-patra/20 bg-bahi-dark/40">
           <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-6 sm:grid-cols-4">
@@ -67,7 +93,7 @@ export function Landing({ user, go }: { user: User | null; go: (to: string) => v
       </section>
 
       {/* How a meeting works: a real sequence, so it is numbered */}
-      <section className="bg-patra">
+      <section className="bg-patra" data-tour="how">
         <div className="mx-auto max-w-6xl px-4 py-16">
           <h2 className="font-display text-4xl text-bahi">{s.howTitle}</h2>
           <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -129,6 +155,12 @@ export function Landing({ user, go }: { user: User | null; go: (to: string) => v
           </div>
         </div>
       </section>
+
+      {touring ? (
+        <Tour steps={SITE_TOUR} lang={lang} onDone={() => { markTourSeen('site'); setTouring(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+      ) : (
+        <SakhiButton onClick={() => setTouring(true)} label={lang === 'en' ? 'Ask Sakhi' : lang === 'mr' ? 'सखीला विचारा' : 'सखी से पूछिए'} />
+      )}
 
       <footer className="bg-bahi-dark py-6 text-center text-sm text-patra/75">
         <p>{s.footer} <a className="underline" href="https://github.com/skypank-coder/bolta-khata" target="_blank" rel="noreferrer">GitHub</a></p>

@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { LangSwitch } from '../components/LangSwitch';
+import { TrialButton } from '../components/TrialButton';
 import { api, ApiError, type User } from '../lib/api';
 import { useDeviceLang } from '../lib/prefs';
 import { SITE } from '../lib/site';
 
 /** Mobile number and a PIN, like UPI: the sign-in every member already knows. */
-export function AuthPage({ mode, go, onSignedIn }: { mode: 'login' | 'signup'; go: (to: string) => void; onSignedIn: (u: User) => void }) {
+export function AuthPage({ mode, go, onSignedIn, onTrial }: { mode: 'login' | 'signup'; go: (to: string) => void; onSignedIn: (u: User) => void; onTrial: () => Promise<void> }) {
   const [lang] = useDeviceLang();
   const a = SITE[lang].auth;
   const [form, setForm] = useState({ phone: '', name: '', pin: '', pin2: '' });
@@ -109,9 +110,14 @@ export function AuthPage({ mode, go, onSignedIn }: { mode: 'login' | 'signup'; g
               {signup ? SITE[lang].nav.login : SITE[lang].nav.signup}
             </button>
           </p>
-          <button type="button" onClick={() => go('/demo')} className="mt-3 w-full text-center text-neel-soft underline underline-offset-4">
-            ▶ {a.demo}
-          </button>
+          <div className="my-5 flex items-center gap-3 text-neel-soft" aria-hidden>
+            <span className="h-px flex-1 bg-neel/25" />{a.or}<span className="h-px flex-1 bg-neel/25" />
+          </div>
+          <TrialButton
+            onTrial={onTrial}
+            label={`▶ ${a.trial}`}
+            className="min-h-[56px] w-full rounded-xl bg-haldi px-4 font-display text-xl text-bahi-dark shadow-[0_5px_0_#8a6200] active:translate-y-1"
+          />
         </form>
       </main>
     </div>

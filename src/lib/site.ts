@@ -9,6 +9,9 @@ const hi = {
     sub: 'हर दीदी अपनी एंट्री खुद बोलती है। फ़ोन पूरे समूह को पढ़कर सुनाता है। “सही है” के बाद ही खाते में लिखा जाता है, और फिर कोई उसे चुपके से बदल नहीं सकता।',
     primary: 'मुफ़्त में समूह बनाइए',
     secondary: 'बिना खाते के डेमो देखिए',
+    trial: 'एक क्लिक में आज़माइए',
+    trialHint: 'नंबर नहीं चाहिए। 12 सदस्यों वाला समूह तैयार मिलेगा, सब कुछ असली।',
+    offlineDemo: 'बिना इंटरनेट डेमो',
     open: 'मेरे समूह खोलिए',
   },
   stats: [['9 करोड़+', 'महिलाएँ स्वयं सहायता समूहों में'], ['90 लाख', 'समूह, हर हफ़्ते मीटिंग'], ['0 ₹', 'हर मीटिंग का खर्च'], ['3', 'भाषाएँ: हिंदी, मराठी, English']],
@@ -51,6 +54,8 @@ const hi = {
     toSignup: 'नया खाता बनाना है?',
     toLogin: 'पहले से खाता है?',
     demo: 'बिना खाते के डेमो देखिए',
+    trial: 'बिना नंबर के, एक क्लिक में आज़माइए',
+    or: 'या',
     errors: {
       bad_phone: 'सही 10 अंक का मोबाइल नंबर लिखिए।',
       bad_name: 'अपना नाम लिखिए।',
@@ -91,6 +96,9 @@ const hi = {
     joinHint: 'NGO या बैंक से हैं? समूह की लीडर से 6 अक्षर का कोड लीजिए।',
     join: 'जुड़िए',
     badCode: 'यह कोड नहीं मिला।',
+    guestTitle: 'आप अतिथि खाते में हैं',
+    guestHint: 'यह खाता 3 दिन बाद हट जाएगा। अपना मोबाइल नंबर और PIN जोड़िए, सारे समूह आपके पास रहेंगे।',
+    claim: 'खाता अपने नाम कीजिए',
   },
 };
 
@@ -105,6 +113,9 @@ const mr: SiteText = {
     sub: 'प्रत्येक ताई आपली नोंद स्वतः सांगते. फोन संपूर्ण गटाला वाचून ऐकवतो. “बरोबर” म्हटल्यावरच खात्यात लिहिलं जातं, आणि मग ते कोणी गुपचूप बदलू शकत नाही.',
     primary: 'मोफत गट तयार करा',
     secondary: 'खात्याशिवाय डेमो पाहा',
+    trial: 'एका क्लिकमध्ये वापरून पाहा',
+    trialHint: 'नंबर नको. 12 सदस्यांचा गट तयार मिळेल, सगळं खरं.',
+    offlineDemo: 'इंटरनेटशिवाय डेमो',
     open: 'माझे गट उघडा',
   },
   stats: [['9 कोटी+', 'महिला बचत गटांमध्ये'], ['90 लाख', 'गट, दर आठवड्याला मीटिंग'], ['0 ₹', 'प्रत्येक मीटिंगचा खर्च'], ['3', 'भाषा: हिंदी, मराठी, English']],
@@ -147,6 +158,8 @@ const mr: SiteText = {
     toSignup: 'नवीन खाते हवं आहे?',
     toLogin: 'आधीच खाते आहे?',
     demo: 'खात्याशिवाय डेमो पाहा',
+    trial: 'नंबरशिवाय, एका क्लिकमध्ये वापरून पाहा',
+    or: 'किंवा',
     errors: {
       bad_phone: 'योग्य 10 अंकी मोबाइल नंबर लिहा.',
       bad_name: 'तुमचं नाव लिहा.',
@@ -185,6 +198,9 @@ const mr: SiteText = {
     joinHint: 'NGO किंवा बँकेतून आहात? गटाच्या अध्यक्षांकडून 6 अक्षरी कोड घ्या.',
     join: 'जोडा',
     badCode: 'हा कोड सापडला नाही.',
+    guestTitle: 'तुम्ही पाहुण्या खात्यात आहात',
+    guestHint: 'हे खाते 3 दिवसांनी काढलं जाईल. आपला मोबाइल नंबर आणि PIN जोडा, सगळे गट तुमच्याकडे राहतील.',
+    claim: 'खाते आपल्या नावावर करा',
   },
 };
 
@@ -196,6 +212,9 @@ const en: SiteText = {
     sub: 'Every member speaks her own entry. The phone reads it back to the whole group. It is written only after the group says “sahi hai”, and after that nobody can quietly change it.',
     primary: 'Create a group for free',
     secondary: 'Watch the demo, no account',
+    trial: 'Try it in one click',
+    trialHint: 'No number needed. A 12-member group is ready, and everything is real.',
+    offlineDemo: 'Offline demo',
     open: 'Open my groups',
   },
   stats: [['9 crore+', 'women in Self-Help Groups'], ['90 lakh', 'groups, meeting every week'], ['₹0', 'cost per meeting'], ['3', 'languages: Hindi, Marathi, English']],
@@ -238,6 +257,8 @@ const en: SiteText = {
     toSignup: 'New here?',
     toLogin: 'Already have an account?',
     demo: 'Watch the demo, no account',
+    trial: 'Try it in one click, no number',
+    or: 'or',
     errors: {
       bad_phone: 'Enter a valid 10-digit mobile number.',
       bad_name: 'Enter your name.',
@@ -278,6 +299,9 @@ const en: SiteText = {
     joinHint: 'From an NGO or a bank? Ask the group leader for the 6-letter code.',
     join: 'Follow',
     badCode: 'That code was not found.',
+    guestTitle: 'You are using a guest account',
+    guestHint: 'It is removed after 3 days. Add your mobile number and a PIN to keep all your groups.',
+    claim: 'Keep this account',
   },
 };
 
