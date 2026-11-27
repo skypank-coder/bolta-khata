@@ -1,132 +1,221 @@
-# Bolta Khata · बोलता खाता
+<div align="center">
 
-**The weekly Self-Help Group meeting, run by voice.** Each woman speaks her own entry, the phone reads it back to the whole group, and nothing is saved until the group says *"sahi hai"*. Every entry is locked to the one before it, so nobody can quietly change the register later.
+# बोलता खाता · Bolta Khata
 
-Built for the *India Runs on Voice* hackathon (Scaler × Wispr Flow), theme: **Livelihoods and small business**.
+### The Self-Help Group register that listens, reads back, and cannot be quietly changed.
+
+*Ten women sit on a durrie. Money changes hands. One of them writes it down.*
+*Now every one of them can hear it.*
+
+![Voice-first](https://img.shields.io/badge/voice--first-Hindi%20%C2%B7%20Marathi%20%C2%B7%20English-9E1B1F?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-124%20passing-1C7A48?style=for-the-badge)
+![Keys needed](https://img.shields.io/badge/API%20keys-none-1D2766?style=for-the-badge)
+![Offline](https://img.shields.io/badge/works-offline-E0A100?style=for-the-badge)
+
+**India Runs on Voice** hackathon (Scaler × Wispr Flow) · Theme: *Livelihoods and small business*
+
+</div>
+
+<table>
+<tr>
+<td width="33%"><img src="docs/screens/meeting.jpg" alt="Meeting screen: the spoken sentence is coloured by what was understood, the entry is read back, and the group answers sahi or galat"></td>
+<td width="33%"><img src="docs/screens/tamper.jpg" alt="Ledger screen after someone secretly changed an old entry: the ledger turns red at exactly that entry"></td>
+<td width="33%"><img src="docs/screens/report.jpg" alt="Bank-ready meeting report with the cash count showing 100 rupees short"></td>
+</tr>
+<tr>
+<td align="center"><b>Speak.</b> Your words light up as they are understood. It reads back. The group says <i>sahi hai</i>.</td>
+<td align="center"><b>Tamper?</b> Change one old rupee and the ledger turns red at exactly that entry.</td>
+<td align="center"><b>Close.</b> Count the cash box by voice. ₹100 short? It is said out loud and locked in.</td>
+</tr>
+</table>
 
 ---
 
-## The problem
-
-About 9 crore rural women in India save and borrow through Self-Help Groups (SHGs). Every week 10 to 15 members meet, hand over money, and one member, the bookkeeper, writes it into a paper register. Often she is the only one who can read it.
-
-- Members cannot check what was written against their own name.
-- Mistakes and misuse surface months later as fights or missing money.
-- If the bookkeeper is absent or leaves, the records stop.
-- Banks want clean books before lending, so messy registers cost the whole group credit.
-
-Existing apps (such as the government's LokOS) still depend on the one member who can read and type. **Bolta Khata makes the record something the whole group hears and checks together.**
-
-## Run it (one command)
+## Try it in 30 seconds
 
 ```bash
 docker compose up --build
 ```
 
-Open **http://localhost:3000** in **Chrome** and allow the microphone. No keys, no `.env`, no sign-up.
+Open **http://localhost:3000** in Chrome. Then either:
 
-No microphone? Tap the example sentences on the screen. They go through exactly the same engine as speech.
+- 🎙️ **tap the mic** and say *"मीटिंग शुरू करो"*, or
+- ▶️ press **"पूरी डेमो मीटिंग चलाइए"** (*Play a full demo meeting*) and watch a whole meeting run itself, by voice, with no mic needed.
 
-Without Docker:
+No keys. No `.env`. No sign-up. No server. Switch to **मराठी** or **English** from the ☰ menu.
+
+<details>
+<summary>Without Docker</summary>
 
 ```bash
 npm install
-npm run dev
+npm run dev     # http://localhost:3000
+npm test        # 124 tests
+```
+</details>
+
+---
+
+## The problem
+
+Over **9 crore** rural women in India save and borrow through about **90 lakh** Self-Help Groups. Every week, 10 to 15 members meet and hand over money, and **one member writes it into a paper register that often only she can read.**
+
+| What happens today | What it costs |
+|---|---|
+| Members cannot check what was written against their name | Mistakes and misuse stay hidden for months |
+| The register is a private notebook | Arguments over "who paid what" break groups apart |
+| The bookkeeper is absent or leaves | Records simply stop |
+| Messy books | Banks hesitate to lend, so the whole group loses credit |
+| Apps like LokOS are typed by the bookkeeper | The same one woman is still in control |
+
+**The meeting already happens out loud. Bolta Khata makes the record happen out loud too.**
+
+---
+
+## A meeting, start to finish
+
+```
+ 👩 Leader   मीटिंग शुरू करो
+ 📒 Khata    मीटिंग शुरू। हाज़िरी के लिए सब अपना नाम बोलिए।
+ 👩 Meena    मैं मीना हूँ                              → 🟢 Meena present
+ 👩 ...      सुनीता
+ 📒 Khata    सुनीता कुमारी या सुनीता यादव?            ← two Sunitas: it asks, never guesses
+ 👩 Sunita   यादव
+ 👩 Meena    मैं मीना, दो सौ रुपये बचत
+ 📒 Khata    मीना देवी: बचत ₹200। सही है?             ← read back to the whole group
+ 👥 Group    हाँ सही है                                → 🟩 सही  (stamped, hash-locked)
+ 👩 Rekha    रेखा की किस्त दो हज़ार
+ 📒 Khata    किस्त ₹1,500, बचत ₹500 …                 ← only ₹1,500 was owed: loan closed, rest to savings
+ 👩 Leader   राधा को ढाई हज़ार लोन
+ 📒 Khata    ग्रुप के पास ₹22,700 से ₹20,200 बचेंगे। नेता जी, मंज़ूर?
+ 👩 Leader   मंज़ूर                                    ← only the leader's word releases a loan
+ 👩 Radha    मेरा कितना जमा है?
+ 📒 Khata    राधा, आपकी कुल बचत ₹3,000। बाकी लोन ₹5,500।
+ 👩 Leader   मीटिंग बंद करो
+ 📒 Khata    आज 4 लोग हाज़िर। बचत ₹700, किस्त ₹1,500, नया लोन ₹2,500 … नकद गिनकर बोलिए।
+ 👩 Leader   हाथ में बीस हज़ार एक सौ है
+ 📒 Khata    पर खाते के हिसाब से ₹20,200 होने चाहिए। ₹100 कम है। यह गिनती खाते में दर्ज हो गई।
+ 👥 Group    सही है                                    → 📄 bank report + 🧾 a receipt for every member
 ```
 
-## Try this (say it, or tap it)
+This exact meeting is the built-in demo, and it runs through the real engine in the test suite in **all three languages**.
 
-| Say | What happens |
+---
+
+## Why it is not "a form with a mic"
+
+### 🗣️ 1. Voice is the safety mechanism, not the input method
+Nothing is written until the group hears it and says *"sahi hai"*. Large amounts are read back **twice**. A loan needs the leader's *"manzoor"* **and** enough cash in the box. Corrections are new entries, never edits. Every spoken question also has a big button for noisy rooms.
+
+### 🔢 2. It understands money the way villages say it
+A hand-written parser, so it **never invents an amount** (no LLM guessing at rupees):
+
+| Said | Understood |
 |---|---|
-| "मीटिंग शुरू करो" / "meeting shuru karo" | Opens today's meeting and starts attendance |
-| "मैं मीना हूँ", "राधा हाज़िर" | Marks members present, by name, in any accent |
-| "सुनीता 100 बचत" | Two Sunitas in the group, so it asks: "सुनीता कुमारी या सुनीता यादव?" |
-| "हाज़िरी पूरी" | Reads out who is present and who is absent |
-| "मैं मीना, सौ रुपये बचत, पाँच सौ किस्त" | Reads it back with her new loan balance, then waits for "सही है" |
-| "रेखा की किस्त दो हज़ार" | Repayment larger than the loan left, so it warns and confirms twice |
-| "राधा को ढाई हज़ार लोन" | Checks group cash, then waits for the leader's "मंज़ूर" |
-| "मेरा कितना जमा है?" | Speaks her own savings and loan balance |
-| "पिछली एंट्री हटाओ" | Cancels the last entry by adding a reversal, never by deleting |
-| "मीटिंग बंद करो" | Reads the day's totals and who paid nothing, then closes on "सही है" |
+| *dedh hazaar*, डेढ़ हज़ार, दीड हजार | ₹1,500 |
+| *saade teen hazaar* | ₹3,500 |
+| *paune do hazaar* | ₹1,750 |
+| *sava sau*, *dhai sau*, अडीच हजार | ₹125, ₹250, ₹2,500 |
+| *ek hazaar do sau pachaas* | ₹1,250 |
+| पाचशे, दोनशे (Marathi) | ₹500, ₹200 |
+| *pachchis hazaar*, पचहत्तर | ₹25,000, ₹75 |
+| *two thousand five hundred*, ₹1,25,000, *2k* | as said |
+| "Sunita ko do hazaar **do**" | ₹2,000 (the last *do* means "give") |
+| "राधा **हजर**" (Marathi: present) | not ₹1,000 |
 
-Switch to **मराठी** or **English** from the menu. Marathi works the same way ("मी मीना, शंभर रुपये बचत", "राधाला दीड हजार कर्ज").
+All 99 irregular Hindi numbers, Marathi forms, English words, Devanagari digits, Indian digit grouping. **Stress-tested on 91,000 spoken amounts from 10 to 99,999.**
 
-## What makes it different
+### 👂 3. It hears Indian names the way recognisers mishear them
+*Sunita, Suneeta, Sunitha* and *सुनीता* reach the same member. *Laxmi = Lakshmi.* Marathi case endings (*राधाला*) are stripped. Hindi schwa deletion (*कितना → kitnaa*) is handled. And when two members sound alike, it **asks instead of guessing**.
 
-**1. The group hears every entry before it is saved.** Read-back plus spoken confirmation is the core of the product, not a feature on top. Large amounts and overpayments are confirmed twice. Only the leader's "manzoor" releases a loan, and only if the group has the cash.
+### 🎨 4. You can *see* it understand
+As she speaks, her own words light up: the **name** underlined, the **amount** in green, **bachat / kist / loan** in red, **sahi / galat** stamped. The group sees it understood before it even answers.
 
-**2. It understands how money is actually said in villages.** A hand-written parser (no AI guessing at amounts) handles:
-- fractions: *dedh hazaar* (1,500), *dhai sau* (250), *saade teen hazaar* (3,500), *paune do hazaar* (1,750), *sava sau* (125)
-- compounds: *do hazaar paanch sau*, *ek hazaar do sau pachaas*
-- all Hindi numbers 1 to 99, Marathi forms (*पाचशे*, *दीड हजार*, *शंभर*), English words, digits, ₹, "2k"
-- Devanagari or Roman input, because Chrome returns Devanagari for Hindi speech
-- false alarms: the last "do" in "Sunita ko do hazaar do" is a verb ("give"), not 2
+### 🔒 5. A register nobody can quietly edit
+Every entry stores the SHA-256 of the entry before it. Press **"छेड़छाड़ करके देखिए"** (*Try tampering*) on the Ledger screen: it secretly takes ₹1,000 off an old entry, and the ledger turns red **at exactly that entry**. Receipts carry the lock code, so a member can prove which version of the khata her receipt came from.
 
-**3. It matches Indian names the way recognisers mishear them.** Sunita, Suneeta, Sunitha and सुनीता all reach the same member. Marathi case endings (*राधाला*) are stripped. When two members sound alike, it asks instead of guessing.
+### 💰 6. The cash box is counted by voice
+The step where SHG money really goes missing is the end-of-meeting cash count. Say *"हाथ में 20,100 है"* and it checks against what the khata says the group should hold, announces any shortfall, and **locks the count into the chain**. The bank report shows it.
 
-**4. A register nobody can quietly edit.** Each entry stores the SHA-256 hash of the entry before it. The *Ledger* screen has a **"Try tampering"** button: it secretly takes ₹1,000 off an old entry, and the ledger turns red at exactly that entry. Mistakes are cancelled by reversal entries, so the history is never rewritten.
+### 🌳 7. Built for a meeting under a tree
+- **Hands-free**: tap once; it listens, answers and listens again for the whole meeting.
+- **Offline**: installable PWA; the ledger lives on the phone (IndexedDB). Nothing is sent to any server.
+- **Three languages**, and Hindi/Marathi spoken in Devanagari by the phone's own voice.
+- **Live mic-level ring**, so speakers can see they are being heard.
 
-**5. Made for a meeting under a tree.**
-- Hands-free mode: tap once, and it listens, answers and listens again for the whole meeting.
-- Works offline as an installable app (PWA). The ledger lives in IndexedDB on the phone; nothing is sent to a server.
-- Every spoken question also has a big button, for noisy rooms.
-- A live mic-level ring shows speakers that they are being heard.
+### 🏦 8. Output a bank will accept
+Meeting report (print / save as PDF), CSV for the federation or bank, and a receipt per member that can be **read aloud in her language** or **sent on WhatsApp**.
 
-**6. Output a bank will accept.** A meeting report (print or save as PDF), a CSV for the federation or bank, and a receipt per member that can be **read aloud** or **sent on WhatsApp**. Each receipt carries the ledger lock code.
+---
+
+## Stress-tested, not demo-tested
+
+```
+ 124 tests · all passing
+ ├─ 91,000  spoken Hindi amounts (10 → 99,999) parsed back exactly
+ ├─  2,000  random amounts × 3 formats (₹, rs, Indian digit grouping)
+ ├─    300  seeded random meetings × 45 noisy utterances each
+ │          (Hinglish, Devanagari, half-sentences, silence, gibberish)
+ │          invariants: hash chain valid · cash never negative ·
+ │          loans never below zero · no money written without a "yes"
+ ├─      3  full demo meetings (Hindi, Marathi, English) through the real engine
+ └─     ...  every example sentence shown on screen, in every language
+```
+
+The stress tests found real bugs that are now fixed and guarded: *tees* (30) was being read as 23, *पचहत्तर* (75) was missed, an overpaid loan could go below zero, and an unanswered loan approval could freeze the meeting. A table check now fails the build if any spoken word ever maps to two numbers.
+
+---
 
 ## How it works
 
-```
- microphone ──► Web Speech API (hi-IN / mr-IN / en-IN, with alternative guesses)
-                    │
-                    ▼
- transliterate (Devanagari → Roman) ─► tokenise ─► money parser ─► name matcher
-                    │
-                    ▼
-           intent parser (start, attendance, entry, confirm, reject, approve,
-                          question, undo, close)
-                    │
-                    ▼
-     meeting state machine  ── pure function: (state, heard, ledger) → (state, reply, entries)
-                    │                                   │
-                    ▼                                   ▼
-       reply in Hindi / Marathi / English     hash-chained ledger (SHA-256)
-                    │                                   │
-                    ▼                                   ▼
-     speechSynthesis + sound cues               IndexedDB on the phone
+```mermaid
+flowchart LR
+  MIC["🎙️ Speech<br/>hi-IN · mr-IN · en-IN<br/>+ alternative guesses"] --> TR["Devanagari → Roman<br/>schwa deletion"]
+  TR --> NUM["Money parser<br/>dedh · saade · paune · -she"]
+  TR --> NAME["Name matcher<br/>phonetic keys · ambiguity"]
+  NUM --> INT["Intent<br/>start · attendance · entry · yes/no<br/>manzoor · question · undo · cash · close"]
+  NAME --> INT
+  INT --> SM["Meeting state machine<br/>pure function, fully tested"]
+  SM --> SAY["🔊 Reply in Hindi / Marathi / English<br/>+ big buttons + sound cues"]
+  SM --> LED["🔒 Hash-chained ledger<br/>SHA-256 · reversals · cash counts"]
+  LED --> DB[("📱 IndexedDB<br/>on the phone")]
+  LED --> OUT["📄 Report · CSV · 🧾 receipts"]
 ```
 
-| Folder | What is in it |
+The heart is `step(state, heard, ledger) → (state, reply, entries)`: a pure function with no timers, audio or storage, which is why a whole meeting can be replayed in a test.
+
+| File | What it does |
 |---|---|
-| `src/lib/translit.ts` | Devanagari to Roman, including Hindi schwa deletion (कितना → kitnaa) |
-| `src/lib/numbers.ts` | Spoken money parser |
-| `src/lib/phonetic.ts` | Indian name matching and ambiguity detection |
-| `src/lib/intent.ts` | What a sentence means |
-| `src/lib/meeting.ts` | The meeting as a tested state machine |
-| `src/lib/ledger.ts` | Hash chain, reversals, balances |
-| `src/lib/phrases.ts` | Everything the app says, in three languages |
-| `src/lib/speech.ts` | Listening, speaking, sound cues, mic level |
-| `src/screens/` | Meeting, Ledger and Report screens |
+| [`src/lib/translit.ts`](src/lib/translit.ts) | Devanagari → Roman, with Hindi schwa deletion |
+| [`src/lib/numbers.ts`](src/lib/numbers.ts) | Spoken money parser |
+| [`src/lib/phonetic.ts`](src/lib/phonetic.ts) | Indian name matching and "which one?" detection |
+| [`src/lib/intent.ts`](src/lib/intent.ts) | What a sentence means, and which words meant it |
+| [`src/lib/meeting.ts`](src/lib/meeting.ts) | The meeting as a state machine |
+| [`src/lib/ledger.ts`](src/lib/ledger.ts) | Hash chain, reversals, balances |
+| [`src/lib/phrases.ts`](src/lib/phrases.ts) | Everything it says, in three languages, plus the demo scripts |
+| [`src/lib/speech.ts`](src/lib/speech.ts) | Listening, speaking, sound cues, mic level |
+| [`src/useBoltaKhata.ts`](src/useBoltaKhata.ts) | Hands-free loop, queued turns, demo player |
 
-## Tests
-
-```bash
-npm test
-```
-
-Over 90 tests, including whole meetings driven by spoken sentences: attendance, read-back, corrections, loan approval, overpayment, cash checks, balance questions, silence and noisy input, and every example sentence shown on screen in all three languages.
+---
 
 ## What it depends on
 
 | Dependency | Used for | If it gets costly or stops working |
 |---|---|---|
-| Browser speech recognition (Chrome / Android) | Turning speech into text | Free today. The rest of the app does not care where text comes from: an on-device model or an Indian STT API (for example Sarvam or Bhashini) can be swapped in behind `listen()`. Typing and tap buttons always work. |
-| Browser speech synthesis | Speaking replies | Free and on-device. If a language voice is missing, it falls back to the Hindi voice and still shows the text. |
-| Nothing else | | No paid AI model, no server, no database. Parsing, matching and the ledger all run on the phone. |
+| Browser speech recognition (Chrome / Android) | Speech → text | Free today, needs internet. The engine only needs text, so an on-device model or an Indian speech API (Bhashini, Sarvam) can be dropped in behind `listen()`. Typing and buttons always work offline. |
+| Browser speech synthesis | Speaking replies | Free, on-device. Missing a Marathi voice? Falls back to Hindi and still shows the text. |
+| **Nothing else** | | **No paid AI model, no server, no database.** ₹0 per meeting. |
+
+## Roadmap for the finale
+
+- Speech recognition that works fully offline (on-device model) and Bhashini for more Indian languages
+- Encrypted backup and sync to the village organisation; LokOS-format export
+- Missed-call / IVR mode, so members with feature phones hear their own balance
+- Speaker check on loan approval, so only the leader's own voice can say *manzoor*
 
 ## Built by voice with Wispr Flow
 
-See the Round 2 submission note for how Wispr Flow was used to build this.
+How Wispr Flow was used to build this is described in the Round 2 submission note.
 
 ## License
 
