@@ -24,6 +24,8 @@ export interface Settings {
   lang: Lang;
   handsFree: boolean;
   geminiKey?: string;
+  /** Has seen the first-run welcome. */
+  welcomed?: boolean;
 }
 
 export interface AppData {

@@ -6,6 +6,7 @@ import { LANG_NAMES, UI } from './lib/ui';
 import { Khata } from './screens/Khata';
 import { Report } from './screens/Report';
 import { Sabha } from './screens/Sabha';
+import { Welcome } from './components/Welcome';
 import { useBoltaKhata } from './useBoltaKhata';
 
 type Tab = 'sabha' | 'khata' | 'report';
@@ -140,6 +141,15 @@ export default function App() {
           </div>
         )}
       </header>
+
+      {!data.settings.welcomed && (
+        <Welcome
+          lang={lang}
+          onLang={(l) => app.updateSettings({ lang: l })}
+          onDemo={() => { app.updateSettings({ welcomed: true }); setTab('sabha'); void app.playDemo(); }}
+          onStart={() => { app.updateSettings({ welcomed: true }); setTab('sabha'); }}
+        />
+      )}
 
       <main>
         {tab === 'sabha' && <Sabha app={app} />}
