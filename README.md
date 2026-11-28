@@ -12,9 +12,7 @@
 
 *India Runs on Voice* (Scaler × Wispr Flow) · Theme: **Livelihoods and small business**
 
-<img src="docs/screens/meeting-en.gif" width="900" alt="Animated: a whole meeting playing by itself in English. Attendance fills the circle of members, two Sunitas are told apart, a savings entry is read back with its words highlighted, a repayment and a loan are approved, coins move in and out of the group pot, and the meeting closes with a summary and marigold petals">
-
-<sub>A whole meeting playing by itself (built-in demo, English). Hindi and Marathi work the same way; the screenshots below are mostly Hindi, the product's first language.</sub>
+<img src="docs/screens/website.jpg" width="900" alt="The Bolta Khata website in Hindi: the headline, a meeting playing live in the hero with the member's words highlighted, the one-click trial button and key numbers">
 
 </div>
 
@@ -113,6 +111,10 @@ The meeting already happens out loud. **Bolta Khata makes the record happen out 
 ---
 
 ## A real meeting, spoken
+
+<p align="center"><img src="docs/screens/meeting-en.gif" width="900" alt="Animated: a whole meeting playing by itself in English. Attendance fills the circle of members, two Sunitas are told apart, a savings entry is read back with its words highlighted, a repayment and a loan are approved, coins move in and out of the group pot, and the meeting closes with a summary and marigold petals">
+
+<br><sub>A whole meeting playing by itself (built-in demo, English). Hindi and Marathi work the same way; the screenshots below are mostly Hindi, the product's first language.</sub></p>
 
 ```
  👩 Leader   मीटिंग शुरू करो
